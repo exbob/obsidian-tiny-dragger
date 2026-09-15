@@ -1,1 +1,105 @@
-/* Tiny Dragger — handle and drop indicator styles are added in later tasks. */
+.tiny-dragger-gutter {
+  width: calc(var(--tiny-dragger-handle-size, 20px) + 12px);
+}
+
+.cm-gutters.tiny-dragger-gutter-host {
+  background: transparent;
+}
+
+.tiny-dragger-handle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--tiny-dragger-handle-size, 20px);
+  color: var(--tiny-dragger-handle-color, var(--text-muted));
+  transform: translateX(var(--tiny-dragger-handle-offset, 0px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tiny-dragger-handle.is-visible,
+.tiny-dragger-handle:hover,
+.tiny-dragger-handle:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tiny-dragger-insert,
+.tiny-dragger-grip {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.tiny-dragger-grip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  place-items: center;
+  width: var(--tiny-dragger-handle-size, 20px);
+  height: var(--tiny-dragger-handle-size, 20px);
+  cursor: grab;
+}
+
+.tiny-dragger-dot {
+  width: 22%;
+  height: 22%;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.tiny-dragger-insert {
+  width: var(--tiny-dragger-handle-size, 20px);
+  height: 8px;
+  position: relative;
+}
+
+.tiny-dragger-insert::before {
+  content: "";
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 50%;
+  height: 1px;
+  background: currentColor;
+  transform: translateY(-50%);
+}
+
+.tiny-dragger-insert:hover::before,
+.tiny-dragger-insert:focus-visible::before {
+  left: 50%;
+  right: auto;
+  width: 8px;
+  height: 2px;
+  transform: translate(-50%, -50%);
+}
+
+.tiny-dragger-insert:hover::after,
+.tiny-dragger-insert:focus-visible::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 8px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+}
+
+.tiny-dragger-source {
+  opacity: 0.45;
+}
+
+.tiny-dragger-drop-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--interactive-accent);
+  pointer-events: none;
+  z-index: 50;
+}
