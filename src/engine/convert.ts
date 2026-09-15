@@ -105,9 +105,10 @@ export function planBlockConvert(
     });
     const converted = applyTextChanges(doc.sliceString(0, doc.length), planned);
     const from = doc.line(block.lines.startLine).from;
-    const to = doc.line(block.lines.endLine).to + (converted.length - doc.length);
-    const rewritten = applyCalloutType(converted.slice(from, to), request.callout);
-    return [{ from, to, insert: rewritten }];
+    const originalTo = doc.line(block.lines.endLine).to;
+    const convertedTo = originalTo + (converted.length - doc.length);
+    const rewritten = applyCalloutType(converted.slice(from, convertedTo), request.callout);
+    return [{ from, to: originalTo, insert: rewritten }];
   }
 
   const target = toConvertTarget(request);

@@ -1,4 +1,3 @@
-import { BlockType } from "md-dragger/domain";
 import { describe, expect, it } from "vitest";
 import { applyTextChanges } from "../../src/engine/apply";
 import { blockAtLine } from "../../src/engine/blocks";
@@ -43,5 +42,13 @@ describe("planBlockConvert", () => {
     const next = convert("hello\n", 1, { kind: "callout", callout: "info" });
     expect(next).toMatch(/> \[!info\]/);
     expect(next).toContain("hello");
+  });
+
+  it("does not swallow the next paragraph when converting to an info callout", () => {
+    const next = convert("hello\n\nnext\n", 1, { kind: "callout", callout: "info" });
+    expect(next).toMatch(/> \[!info\]/);
+    expect(next).toContain("hello");
+    expect(next).toMatch(/\nnext\n?$/);
+    expect(next).not.toMatch(/^>\s*next/m);
   });
 });
