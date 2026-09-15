@@ -14,11 +14,27 @@ export function readTabSize(view: TabSizeHost): number {
   return typeof value === "number" && value > 0 ? value : 4;
 }
 
+export function selectionToLines(
+  from: number,
+  to: number,
+  empty: boolean,
+  lineAt: (pos: number) => { number: number },
+): SelectionLines {
+  const fromLine = lineAt(from).number;
+  const toLine = empty
+    ? lineAt(to).number
+    : lineAt(Math.max(from, to - 1)).number;
+  return selectionLinesFromRange(fromLine, toLine, empty);
+}
+
 export function readSelectionLines(view: EditorView): SelectionLines {
   const sel = view.state.selection.main;
-  const fromLine = view.state.doc.lineAt(sel.from).number;
-  const toLine = view.state.doc.lineAt(sel.to).number;
-  return selectionLinesFromRange(fromLine, toLine, sel.empty);
+  return selectionToLines(
+    sel.from,
+    sel.to,
+    sel.empty,
+    (pos) => view.state.doc.lineAt(pos),
+  );
 }
 
 export function mergeChanges(changes: TextChange[]): TextChange[] {

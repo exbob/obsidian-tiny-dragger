@@ -93,23 +93,29 @@ function payloadSpan(payload: BlockSelection): {
   return { startLine, endLine };
 }
 
+function pointerInsideCurrentPane(
+  view: EditorView,
+  clientX: number,
+  clientY: number,
+): boolean {
+  const rect = view.scrollDOM.getBoundingClientRect();
+  return (
+    clientX >= rect.left &&
+    clientX <= rect.right &&
+    clientY >= rect.top &&
+    clientY <= rect.bottom
+  );
+}
+
 function readBelowMid(view: EditorView, pos: number, clientY: number): boolean {
   const block = view.lineBlockAt(pos);
-  const scroller = view.scrollDOM.getBoundingClientRect();
-  const mid =
-    scroller.top - view.scrollDOM.scrollTop + (block.top + block.bottom) / 2;
-  return clientY > mid;
+  return clientY > view.documentTop + (block.top + block.bottom) / 2;
 }
 
 function dropLineY(view: EditorView, pos: number, belowMid: boolean): number {
-  const line = view.state.doc.lineAt(pos);
-  const coords = view.coordsAtPos(belowMid ? line.to : line.from);
-  if (coords === null) {
-    const block = view.lineBlockAt(pos);
-    const y = belowMid ? block.bottom : block.top;
-    return y - view.scrollDOM.scrollTop;
-  }
-  return (belowMid ? coords.bottom : coords.top) - view.scrollDOM.getBoundingClientRect().top;
+  const block = view.lineBlockAt(pos);
+  const screenY = view.documentTop + (belowMid ? block.bottom : block.top);
+  return screenY - view.scrollDOM.getBoundingClientRect().top;
 }
 
 export class DragSession {
@@ -240,6 +246,12 @@ export class DragSession {
   }
 
   private updateDropLine(current: ActiveDrag, event: PointerEvent): void {
+    if (
+      !pointerInsideCurrentPane(current.view, event.clientX, event.clientY)
+    ) {
+      this.indicator.hide();
+      return;
+    }
     const pos = current.view.posAtCoords({ x: event.clientX, y: event.clientY });
     if (pos === null) {
       this.indicator.hide();
@@ -250,8 +262,15 @@ export class DragSession {
   }
 
   private commitDrop(current: ActiveDrag, event: PointerEvent): void {
+    if (
+      !pointerInsideCurrentPane(current.view, event.clientX, event.clientY)
+    ) {
+      this.indicator.hide();
+      return;
+    }
     const pos = current.view.posAtCoords({ x: event.clientX, y: event.clientY });
     if (pos === null) {
+      this.indicator.hide();
       return;
     }
     const tabSize = readTabSize(current.view);
