@@ -56,6 +56,7 @@ export class MenuItem {
   icon = "";
   warning = false;
   clickHandler: ((evt: MouseEvent) => unknown) | null = null;
+  submenu: Menu | null = null;
 
   setTitle(title: string): this {
     this.title = title;
@@ -76,6 +77,11 @@ export class MenuItem {
     this.clickHandler = callback;
     return this;
   }
+
+  setSubmenu(): Menu {
+    this.submenu = new Menu();
+    return this.submenu;
+  }
 }
 
 type MenuEntry =
@@ -89,6 +95,18 @@ export class Menu {
   addItem(cb: (item: MenuItem) => unknown): this {
     const item = new MenuItem();
     cb(item);
+    if (item.submenu !== null) {
+      const items = item.submenu.entries
+        .filter((entry): entry is { kind: "item"; item: MenuItem } => entry.kind === "item")
+        .map((entry) => entry.item);
+      this.entries.push({
+        kind: "submenu",
+        title: item.title,
+        icon: item.icon,
+        items,
+      });
+      return this;
+    }
     this.entries.push({ kind: "item", item });
     return this;
   }
