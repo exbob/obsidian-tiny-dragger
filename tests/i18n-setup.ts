@@ -1,5 +1,6 @@
 import { beforeEach } from "vitest";
+import { setLocaleForTests } from "../src/i18n";
 
 beforeEach(() => {
-  // Locale override is installed in Task 2.
+  setLocaleForTests("zh");
 });
