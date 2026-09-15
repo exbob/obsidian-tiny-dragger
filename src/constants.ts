@@ -1,0 +1,14 @@
+export const PLUGIN_ID = "tiny-dragger";
+export const PLUGIN_NAME = "Tiny Dragger";
+export const MIN_APP_VERSION = "1.7.2";
+export const DRAG_THRESHOLD_PX = 4;
+export const HANDLE_SIZE_MIN = 12;
+export const HANDLE_SIZE_MAX = 28;
+export const HANDLE_SIZE_STEP = 2;
+export const HANDLE_SIZE_DEFAULT = 20;
+export const HANDLE_OFFSET_MIN = -80;
+export const HANDLE_OFFSET_MAX = 80;
+export const HANDLE_OFFSET_DEFAULT = 0;
+export const DEFAULT_HANDLE_COLOR = "#888888";
+export const AUTO_SCROLL_EDGE_PX = 28;
+export const AUTO_SCROLL_MAX_SPEED_PX = 18;
