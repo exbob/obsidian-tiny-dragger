@@ -11,6 +11,7 @@ import {
   forEachLiveEditorView,
   handleGutterExtension,
 } from "./ui/handle-gutter";
+import { TinyDraggerSettingTab } from "./ui/settings-tab";
 
 export default class TinyDraggerPlugin extends Plugin {
   settings: TinyDraggerSettings = DEFAULT_SETTINGS;
@@ -39,6 +40,7 @@ export default class TinyDraggerPlugin extends Plugin {
         this.session?.cancel();
       }),
     );
+    this.addSettingTab(new TinyDraggerSettingTab(this.app, this));
   }
 
   onunload(): void {
