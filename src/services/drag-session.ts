@@ -112,10 +112,14 @@ function readBelowMid(view: EditorView, pos: number, clientY: number): boolean {
   return clientY > view.documentTop + (block.top + block.bottom) / 2;
 }
 
-function dropLineY(view: EditorView, pos: number, belowMid: boolean): number {
+export function dropLineY(view: EditorView, pos: number, belowMid: boolean): number {
   const block = view.lineBlockAt(pos);
   const screenY = view.documentTop + (belowMid ? block.bottom : block.top);
-  return screenY - view.scrollDOM.getBoundingClientRect().top;
+  return (
+    screenY -
+    view.scrollDOM.getBoundingClientRect().top +
+    view.scrollDOM.scrollTop
+  );
 }
 
 export class DragSession {
@@ -128,6 +132,10 @@ export class DragSession {
   constructor(options: DragSessionOptions) {
     this.getSettings = options.getSettings;
     this.onGripClick = options.onGripClick;
+  }
+
+  isDragSessionActive(): boolean {
+    return this.active !== null;
   }
 
   onGripPointerDown(
@@ -283,6 +291,7 @@ export class DragSession {
       dx: event.clientX - current.startX,
       tabSize,
       indentUnit: tabSize,
+      indentStepPx: Math.max(1, current.view.defaultCharacterWidth * tabSize),
     });
     if (edits === null) {
       return;

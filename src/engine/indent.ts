@@ -1,18 +1,21 @@
 import { parseLine, type BlockSelection, type Doc } from "md-dragger/domain";
 
+const DEFAULT_INDENT_STEP_PX = 32;
+
 export function indentWidthFromDx(
   originWidth: number,
-  dx: number,
-  indentUnit: number,
+  dxPx: number,
+  indentUnitColumns: number,
+  indentStepPx = DEFAULT_INDENT_STEP_PX,
 ): number {
-  if (indentUnit <= 0) {
+  if (indentUnitColumns <= 0 || indentStepPx <= 0) {
     return originWidth;
   }
-  if (Math.abs(dx) < indentUnit / 2) {
+  if (Math.abs(dxPx) < indentStepPx / 2) {
     return originWidth;
   }
-  const steps = Math.round(dx / indentUnit);
-  return Math.max(0, originWidth + steps * indentUnit);
+  const steps = Math.round(dxPx / indentStepPx);
+  return Math.max(0, originWidth + steps * indentUnitColumns);
 }
 
 export function sourceIndentWidth(

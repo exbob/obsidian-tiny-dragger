@@ -185,7 +185,14 @@ function deleteOpenedBlock(
     new Notice(t(mode === "cut" ? "notice.cutFailed" : "notice.deleteFailed"));
     return;
   }
-  dispatchChanges(view, edit.changes);
+  try {
+    dispatchChanges(view, edit.changes);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    new Notice(
+      t(mode === "cut" ? "notice.cutFailed" : "notice.deleteFailed", { detail }),
+    );
+  }
 }
 
 function convertOpenedBlock(

@@ -109,7 +109,8 @@ function applyHandleCssVars(view: EditorView, settings: TinyDraggerSettings): vo
 }
 
 function hoveredStartLineAt(view: EditorView, event: MouseEvent): number | null {
-  const pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
+  const coords = { x: event.clientX, y: event.clientY };
+  const pos = view.posAtCoords(coords) ?? view.posAtCoords(coords, false);
   if (pos === null) {
     return null;
   }
@@ -127,9 +128,31 @@ export function handleGutterExtension(config: HandleGutterConfig): Extension {
   const settings = config.getSettings();
   const hoverPlugin = ViewPlugin.fromClass(
     class HandleHoverPlugin {
+      private readonly onMouseMove: (event: MouseEvent) => void;
+      private readonly onMouseLeave: () => void;
+
       constructor(readonly view: EditorView) {
         liveViews.add(view);
         applyHandleCssVars(view, config.getSettings());
+        this.onMouseMove = (event: MouseEvent) => {
+          const next = hoveredStartLineAt(view, event);
+          if (next === null) {
+            return;
+          }
+          if (view.state.field(hoveredStartLineField) !== next) {
+            view.dispatch({ effects: setHoveredStartLine.of(next) });
+          }
+        };
+        this.onMouseLeave = () => {
+          if (config.session.isDragSessionActive()) {
+            return;
+          }
+          if (view.state.field(hoveredStartLineField) !== null) {
+            view.dispatch({ effects: setHoveredStartLine.of(null) });
+          }
+        };
+        view.dom.addEventListener("mousemove", this.onMouseMove);
+        view.dom.addEventListener("mouseleave", this.onMouseLeave);
       }
 
       update(): void {
@@ -137,23 +160,10 @@ export function handleGutterExtension(config: HandleGutterConfig): Extension {
       }
 
       destroy(): void {
+        this.view.dom.removeEventListener("mousemove", this.onMouseMove);
+        this.view.dom.removeEventListener("mouseleave", this.onMouseLeave);
         liveViews.delete(this.view);
       }
-    },
-    {
-      eventObservers: {
-        mousemove(event) {
-          const next = hoveredStartLineAt(this.view, event);
-          if (this.view.state.field(hoveredStartLineField) !== next) {
-            this.view.dispatch({ effects: setHoveredStartLine.of(next) });
-          }
-        },
-        mouseleave() {
-          if (this.view.state.field(hoveredStartLineField) !== null) {
-            this.view.dispatch({ effects: setHoveredStartLine.of(null) });
-          }
-        },
-      },
     },
   );
 

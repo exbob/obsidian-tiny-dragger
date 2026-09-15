@@ -205,4 +205,31 @@ describe("openBlockMenu", () => {
     expect(next).toContain("keep");
     expect(next).not.toContain("gone");
   });
+
+  it("shows a notice when delete dispatch throws", async () => {
+    const text = "hello\n";
+    const { view } = createView(text);
+    view.dispatch = () => {
+      throw new RangeError("from");
+    };
+    const menu = captureMenu(view, text, 1);
+    await clickItem(menu, "Delete block");
+    expect(noticeStub().messages).toContain("Could not delete this block");
+  });
+
+  it("shows a notice when cut dispatch throws after copying", async () => {
+    const text = "keep\n\ngone\n";
+    const { view } = createView(text);
+    view.dispatch = () => {
+      throw new RangeError("from");
+    };
+    vi.stubGlobal("navigator", {
+      clipboard: {
+        writeText: vi.fn().mockResolvedValue(undefined),
+      },
+    });
+    const menu = captureMenu(view, text, 3);
+    await clickItem(menu, "Cut block");
+    expect(noticeStub().messages).toContain("Could not cut this block");
+  });
 });
