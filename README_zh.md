@@ -8,7 +8,7 @@ Tiny Dragger 是一个 [Obsidian](https://obsidian.md/) **桌面** 插件，用�
 
 - **显示名称：** Tiny Dragger
 - **插件 ID：** `tiny-dragger`
-- **最低 Obsidian 版本：** 1.7.2
+- **最低 Obsidian 版本：** 1.13.0
 - **许可证：** [GPL-3.0](LICENSE)（依赖 `md-dragger` 为 MIT）
 - **界面语言：** 跟随 Obsidian 应用语言。语言代码以 `zh` 开头时显示简体中文，其他语言显示英文。
 

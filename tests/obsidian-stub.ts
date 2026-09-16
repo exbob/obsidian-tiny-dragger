@@ -106,6 +106,8 @@ function installDomHelpers(): void {
 
   const nodeProto = Node.prototype as Node & {
     createEl: typeof createEl;
+    createDiv: typeof createDiv;
+    createSpan: typeof createSpan;
   };
   if (nodeProto.createEl === undefined) {
     nodeProto.createEl = function nodeCreateEl(tag, o, callback) {
@@ -114,6 +116,24 @@ function installDomHelpers(): void {
           ? { cls: o, parent: this }
           : { ...(o ?? {}), parent: o?.parent ?? this };
       return createEl(tag, opts, callback);
+    };
+  }
+  if (nodeProto.createDiv === undefined) {
+    nodeProto.createDiv = function nodeCreateDiv(o, callback) {
+      const opts =
+        typeof o === "string"
+          ? { cls: o, parent: this }
+          : { ...(o ?? {}), parent: o?.parent ?? this };
+      return createDiv(opts, callback);
+    };
+  }
+  if (nodeProto.createSpan === undefined) {
+    nodeProto.createSpan = function nodeCreateSpan(o, callback) {
+      const opts =
+        typeof o === "string"
+          ? { cls: o, parent: this }
+          : { ...(o ?? {}), parent: o?.parent ?? this };
+      return createSpan(opts, callback);
     };
   }
 

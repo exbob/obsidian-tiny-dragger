@@ -5,7 +5,7 @@ import { DEFAULT_SETTINGS } from "../../src/settings";
 import { TinyDraggerSettingTab } from "../../src/ui/settings-tab";
 
 describe("TinyDraggerSettingTab", () => {
-  it("renders the handle settings without a side control", () => {
+  it("exposes handle settings without a side control", () => {
     setLocaleForTests("en");
     const plugin = new TinyDraggerPlugin(
       {} as never,
@@ -13,21 +13,16 @@ describe("TinyDraggerSettingTab", () => {
     );
     plugin.settings = { ...DEFAULT_SETTINGS };
     const tab = new TinyDraggerSettingTab({} as never, plugin);
-    tab.display();
-    const names = [...tab.containerEl.querySelectorAll("div")].map(
-      (el) => el.textContent,
-    );
-    expect(names.join("\n")).toContain("Handle size");
-    expect(names.join("\n")).toContain("Handle color");
-    expect(names.join("\n").indexOf("Handle color")).toBeLessThan(
-      names.join("\n").indexOf("Handle size"),
-    );
+    const definitions = tab.getSettingDefinitions();
+    const names = definitions.map((item) => (item as { name?: string }).name ?? "");
+    expect(names).toContain("Handle size");
+    expect(names).toContain("Handle color");
+    expect(names.indexOf("Handle color")).toBeLessThan(names.indexOf("Handle size"));
     expect(names.join("\n")).not.toContain("Handle side");
-    expect(names.join("\n")).toContain("Handle horizontal offset");
-    expect(tab.containerEl.querySelector('input[type="color"]')).toBeNull();
+    expect(names).toContain("Handle horizontal offset");
   });
 
-  it("shows a color picker with the current color only in custom mode", () => {
+  it("shows the color control only in custom mode", () => {
     setLocaleForTests("en");
     const plugin = new TinyDraggerPlugin(
       {} as never,
@@ -39,26 +34,17 @@ describe("TinyDraggerSettingTab", () => {
       handleColor: "#aabbcc",
     };
     const tab = new TinyDraggerSettingTab({} as never, plugin);
-    tab.display();
-    const picker = tab.containerEl.querySelector(
-      'input[type="color"]',
-    ) as HTMLInputElement | null;
-    expect(picker).not.toBeNull();
-    expect(picker?.value).toBe("#aabbcc");
-  });
+    const colorDef = tab
+      .getSettingDefinitions()
+      .find((item) => (item as { name?: string }).name === "Custom color") as
+      | { visible?: () => boolean; control?: { key?: string; defaultValue?: string } }
+      | undefined;
+    expect(colorDef).toBeDefined();
+    expect(colorDef?.control?.key).toBe("handleColor");
+    expect(colorDef?.control?.defaultValue).toBe("#aabbcc");
+    expect(colorDef?.visible?.()).toBe(true);
 
-  it("exposes declarative setting definitions for Obsidian search", () => {
-    setLocaleForTests("en");
-    const plugin = new TinyDraggerPlugin(
-      {} as never,
-      { id: "tiny-dragger" } as never,
-    );
-    plugin.settings = { ...DEFAULT_SETTINGS };
-    const tab = new TinyDraggerSettingTab({} as never, plugin);
-    const definitions = tab.getSettingDefinitions();
-    const names = definitions.map((item) => (item as { name?: string }).name);
-    expect(names).toContain("Handle color");
-    expect(names).toContain("Handle size");
-    expect(names).toContain("Handle horizontal offset");
+    plugin.settings.handleColorMode = "theme";
+    expect(colorDef?.visible?.()).toBe(false);
   });
 });

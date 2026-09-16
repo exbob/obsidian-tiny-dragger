@@ -106,7 +106,7 @@ class HandleGutterMarker extends GutterMarker {
 
 class HandleSpacerMarker extends GutterMarker {
   toDOM(): HTMLElement {
-    return createEl("div", { cls: "tiny-dragger-gutter-spacer" });
+    return createDiv({ cls: "tiny-dragger-gutter-spacer" });
   }
 }
 

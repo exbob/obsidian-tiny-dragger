@@ -1,8 +1,8 @@
 {
   "id": "tiny-dragger",
   "name": "Tiny Dragger",
-  "version": "1.0.1",
-  "minAppVersion": "1.7.2",
+  "version": "1.0.2",
+  "minAppVersion": "1.13.0",
   "description": "Drag and rearrange Markdown blocks inside a note.",
   "author": "LiShaocheng",
   "authorUrl": "https://shaocheng.li",

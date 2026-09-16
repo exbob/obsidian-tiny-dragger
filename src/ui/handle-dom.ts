@@ -35,7 +35,7 @@ export function applyHandleLineAlign(
 }
 
 export function createHandleElement(handlers: HandleDomHandlers): HTMLElement {
-  const root = createEl("div", { cls: "tiny-dragger-handle" });
+  const root = createDiv({ cls: "tiny-dragger-handle" });
 
   const grip = root.createEl("button", {
     cls: "tiny-dragger-grip",
@@ -50,7 +50,7 @@ export function createHandleElement(handlers: HandleDomHandlers): HTMLElement {
     handlers.onGripPointerDown(event);
   });
   for (let i = 0; i < 4; i++) {
-    grip.createEl("span", { cls: "tiny-dragger-dot" });
+    grip.createSpan({ cls: "tiny-dragger-dot" });
   }
 
   return root;

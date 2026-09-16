@@ -8,7 +8,7 @@ Block detection, moves, indent, and basic type conversion use the MIT [`md-dragg
 
 - **Display name:** Tiny Dragger
 - **Plugin ID:** `tiny-dragger`
-- **Minimum Obsidian version:** 1.7.2
+- **Minimum Obsidian version:** 1.13.0
 - **License:** [GPL-3.0](LICENSE) (the `md-dragger` dependency is MIT)
 - **UI language:** Follows the Obsidian app language. Codes starting with `zh` show Simplified Chinese. All other languages show English.
 

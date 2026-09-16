@@ -11,7 +11,7 @@ export class DropIndicator {
       return;
     }
     this.detach();
-    const element = host.createEl("div", { cls: "tiny-dragger-drop-line" });
+    const element = host.createDiv({ cls: "tiny-dragger-drop-line" });
     element.hidden = true;
     this.host = host;
     this.element = element;
