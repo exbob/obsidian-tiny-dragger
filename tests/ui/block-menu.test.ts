@@ -1,8 +1,9 @@
 import type { EditorView } from "@codemirror/view";
+import { selectBlocks, selectOne } from "md-dragger/domain";
 import { Menu, Notice } from "obsidian";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { applyTextChanges } from "../../src/engine/apply";
-import { blockAtLine } from "../../src/engine/blocks";
+import { blockAtLine, collectBlocks } from "../../src/engine/blocks";
 import { docFromText } from "../../src/engine/doc";
 import { setLocaleForTests } from "../../src/i18n";
 import { openBlockMenu, populateBlockMenu } from "../../src/ui/block-menu";
@@ -71,11 +72,11 @@ function appliedText(text: string, dispatches: Dispatched[]): string {
   return next;
 }
 
-function captureMenu(view: EditorView, text: string, line: number): StubMenu {
-  const block = blockAtLine(docFromText(text), line, 4);
-  if (block === null) {
-    throw new Error("expected a block");
-  }
+function captureMenuWithSelection(
+  view: EditorView,
+  text: string,
+  selection: ReturnType<typeof selectBlocks>,
+): StubMenu {
   const shown: Menu[] = [];
   const spy = vi
     .spyOn(Menu.prototype, "showAtMouseEvent")
@@ -83,13 +84,21 @@ function captureMenu(view: EditorView, text: string, line: number): StubMenu {
       shown.push(this);
       return this;
     });
-  openBlockMenu({ view, block, event: new MouseEvent("click") });
+  openBlockMenu({ view, selection, event: new MouseEvent("click") });
   spy.mockRestore();
   const menu = shown[0];
   if (menu === undefined) {
     throw new Error("expected the block menu to show");
   }
   return asStubMenu(menu);
+}
+
+function captureMenu(view: EditorView, text: string, line: number): StubMenu {
+  const block = blockAtLine(docFromText(text), line, 4);
+  if (block === null) {
+    throw new Error("expected a block");
+  }
+  return captureMenuWithSelection(view, text, selectOne(block));
 }
 
 function findItem(menu: StubMenu, title: string): StubMenuItem {
@@ -193,6 +202,35 @@ describe("openBlockMenu", () => {
     expect(next).not.toMatch(/^# beta/m);
   });
 
+  it("converts every block in the opened selection", async () => {
+    const text = "alpha\n\nbravo\n";
+    const { view, dispatches } = createView(text);
+    const blocks = collectBlocks(docFromText(text), 4);
+    const menu = captureMenuWithSelection(view, text, selectBlocks(blocks));
+    await clickItem(menu, "Heading 1");
+    const next = appliedText(text, dispatches);
+    expect(next).toMatch(/^# alpha/m);
+    expect(next).toMatch(/^# bravo/m);
+    expect(dispatches).toHaveLength(1);
+  });
+
+  it("copies then deletes the whole selection on cut", async () => {
+    const text = "keep\n\nalpha\n\nbravo\n";
+    const { view, dispatches } = createView(text);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal("navigator", { clipboard: { writeText } });
+    const doc = docFromText(text);
+    const blocks = collectBlocks(doc, 4).slice(1);
+    const menu = captureMenuWithSelection(view, text, selectBlocks(blocks));
+    await clickItem(menu, "Cut block");
+    expect(writeText).toHaveBeenCalledWith("alpha\n\nbravo\n");
+    const next = appliedText(text, dispatches);
+    expect(next).toContain("keep");
+    expect(next).not.toContain("alpha");
+    expect(next).not.toContain("bravo");
+    expect(dispatches).toHaveLength(1);
+  });
+
   it("does not delete when copying fails", async () => {
     const text = "keep\n\ngone\n";
     const { view, dispatches } = createView(text);
@@ -204,7 +242,7 @@ describe("openBlockMenu", () => {
     const menu = captureMenu(view, text, 3);
     await clickItem(menu, "Cut block");
     expect(dispatches).toEqual([]);
-    expect(noticeStub().messages).toContain("Could not copy this block");
+    expect(noticeStub().messages).toContain("Could not copy");
   });
 
   it("copies the opened block then deletes it on cut", async () => {
@@ -230,7 +268,7 @@ describe("openBlockMenu", () => {
     };
     const menu = captureMenu(view, text, 1);
     await clickItem(menu, "Delete block");
-    expect(noticeStub().messages).toContain("Could not delete this block");
+    expect(noticeStub().messages).toContain("Could not delete");
   });
 
   it("shows a notice when cut dispatch throws after copying", async () => {
@@ -246,7 +284,7 @@ describe("openBlockMenu", () => {
     });
     const menu = captureMenu(view, text, 3);
     await clickItem(menu, "Cut block");
-    expect(noticeStub().messages).toContain("Could not cut this block");
+    expect(noticeStub().messages).toContain("Could not cut");
   });
 
   it("invokes onClose when the menu hides", () => {
@@ -263,7 +301,7 @@ describe("openBlockMenu", () => {
       });
     openBlockMenu({
       view,
-      block,
+      selection: selectOne(block),
       event: new MouseEvent("click"),
       onClose,
     });

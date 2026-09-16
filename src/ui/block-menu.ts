@@ -1,8 +1,8 @@
 import type { EditorView } from "@codemirror/view";
-import { selectOne, type Block } from "md-dragger/domain";
+import type { BlockSelection } from "md-dragger/domain";
 import { Menu, Notice, type MenuItem } from "obsidian";
-import { blockText } from "../engine/clipboard";
-import { planBlockConvert, type ConvertRequest } from "../engine/convert";
+import { selectionText } from "../engine/clipboard";
+import { planSelectionConvert, type ConvertRequest } from "../engine/convert";
 import { planBlockDelete } from "../engine/delete";
 import { t } from "../i18n";
 import { dispatchChanges, docFromView } from "../services/editor-host";
@@ -128,14 +128,14 @@ export function populateBlockMenu(
 
 export function openBlockMenu(params: {
   view: EditorView;
-  block: Block;
+  selection: BlockSelection;
   event: MouseEvent;
   settings?: unknown;
   onClose?: () => void;
 }): void {
   const menu = new Menu();
   populateBlockMenu(menu, (action) =>
-    runBlockMenuAction(params.view, params.block, action),
+    runBlockMenuAction(params.view, params.selection, action),
   );
   if (params.onClose !== undefined) {
     menu.onHide(params.onClose);
@@ -149,31 +149,34 @@ function submenuOf(item: MenuItem): Menu {
 
 async function runBlockMenuAction(
   view: EditorView,
-  block: Block,
+  selection: BlockSelection,
   action: BlockMenuAction,
 ): Promise<void> {
   if (action.kind === "copy") {
-    await copyOpenedBlock(view, block);
+    await copyOpenedSelection(view, selection);
     return;
   }
   if (action.kind === "cut") {
-    const copied = await copyOpenedBlock(view, block);
+    const copied = await copyOpenedSelection(view, selection);
     if (!copied) {
       return;
     }
-    deleteOpenedBlock(view, block, "cut");
+    deleteOpenedSelection(view, selection, "cut");
     return;
   }
   if (action.kind === "delete") {
-    deleteOpenedBlock(view, block, "delete");
+    deleteOpenedSelection(view, selection, "delete");
     return;
   }
-  convertOpenedBlock(view, block, action);
+  convertOpenedSelection(view, selection, action);
 }
 
-async function copyOpenedBlock(view: EditorView, block: Block): Promise<boolean> {
+async function copyOpenedSelection(
+  view: EditorView,
+  selection: BlockSelection,
+): Promise<boolean> {
   try {
-    await navigator.clipboard.writeText(blockText(docFromView(view), block));
+    await navigator.clipboard.writeText(selectionText(docFromView(view), selection));
     return true;
   } catch {
     new Notice(t("notice.copyFailed"));
@@ -181,12 +184,12 @@ async function copyOpenedBlock(view: EditorView, block: Block): Promise<boolean>
   }
 }
 
-function deleteOpenedBlock(
+function deleteOpenedSelection(
   view: EditorView,
-  block: Block,
+  selection: BlockSelection,
   mode: "cut" | "delete",
 ): void {
-  const edit = planBlockDelete(docFromView(view), selectOne(block));
+  const edit = planBlockDelete(docFromView(view), selection);
   if (edit === null) {
     new Notice(t(mode === "cut" ? "notice.cutFailed" : "notice.deleteFailed"));
     return;
@@ -201,13 +204,13 @@ function deleteOpenedBlock(
   }
 }
 
-function convertOpenedBlock(
+function convertOpenedSelection(
   view: EditorView,
-  block: Block,
+  selection: BlockSelection,
   request: ConvertRequest,
 ): void {
   try {
-    const planned = planBlockConvert(docFromView(view), block, request);
+    const planned = planSelectionConvert(docFromView(view), selection, request);
     if (planned === "noop") {
       return;
     }

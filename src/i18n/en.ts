@@ -30,8 +30,8 @@ export const en: Record<MessageKey, string> = {
   "menu.cut": "Cut block",
   "menu.delete": "Delete block",
   "handle.grip": "Drag block",
-  "notice.convertFailed": "Could not convert this block: {detail}",
-  "notice.copyFailed": "Could not copy this block",
-  "notice.cutFailed": "Could not cut this block",
-  "notice.deleteFailed": "Could not delete this block",
+  "notice.convertFailed": "Could not convert: {detail}",
+  "notice.copyFailed": "Could not copy",
+  "notice.cutFailed": "Could not cut",
+  "notice.deleteFailed": "Could not delete",
 };

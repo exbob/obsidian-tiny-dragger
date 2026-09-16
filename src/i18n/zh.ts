@@ -29,8 +29,8 @@ export const zh: Record<MessageKey, string> = {
   "menu.cut": "剪切块",
   "menu.delete": "删除块",
   "handle.grip": "拖拽块",
-  "notice.convertFailed": "无法转换该块：{detail}",
-  "notice.copyFailed": "无法复制该块",
-  "notice.cutFailed": "无法剪切该块",
-  "notice.deleteFailed": "无法删除该块",
+  "notice.convertFailed": "无法转换：{detail}",
+  "notice.copyFailed": "无法复制",
+  "notice.cutFailed": "无法剪切",
+  "notice.deleteFailed": "无法删除",
 };

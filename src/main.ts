@@ -1,4 +1,5 @@
 import { Compartment, type Extension } from "@codemirror/state";
+import { selectOne } from "md-dragger/domain";
 import { Plugin } from "obsidian";
 import { DragSession } from "./services/drag-session";
 import {
@@ -28,7 +29,7 @@ export default class TinyDraggerPlugin extends Plugin {
         pinHandleStartLine(view, block.lines.startLine);
         openBlockMenu({
           view,
-          block,
+          selection: selectOne(block),
           event,
           settings: this.settings,
           onClose: () => pinHandleStartLine(view, null),

@@ -20,11 +20,11 @@ describe("i18n", () => {
   it("interpolates notices", () => {
     setLocaleForTests("en");
     expect(t("notice.convertFailed", { detail: "boom" })).toBe(
-      "Could not convert this block: boom",
+      "Could not convert: boom",
     );
     setLocaleForTests("zh");
     expect(t("notice.convertFailed", { detail: "boom" })).toBe(
-      "无法转换该块：boom",
+      "无法转换：boom",
     );
   });
 });
