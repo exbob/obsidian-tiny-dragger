@@ -3,8 +3,6 @@ import { handleCssColor, handleCssOffset, type TinyDraggerSettings } from "../se
 
 export interface HandleDomHandlers {
   onGripPointerDown: (event: PointerEvent) => void;
-  onInsertAbove: (event: MouseEvent) => void;
-  onInsertBelow: (event: MouseEvent) => void;
 }
 
 export function applyHandleAppearance(
@@ -19,16 +17,6 @@ export function applyHandleAppearance(
 export function createHandleElement(handlers: HandleDomHandlers): HTMLElement {
   const root = document.createElement("div");
   root.className = "tiny-dragger-handle";
-
-  const above = document.createElement("button");
-  above.type = "button";
-  above.className = "tiny-dragger-insert tiny-dragger-insert-above";
-  above.setAttribute("aria-label", t("handle.insertAbove"));
-  above.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    handlers.onInsertAbove(event);
-  });
 
   const grip = document.createElement("button");
   grip.type = "button";
@@ -45,16 +33,6 @@ export function createHandleElement(handlers: HandleDomHandlers): HTMLElement {
     grip.append(dot);
   }
 
-  const below = document.createElement("button");
-  below.type = "button";
-  below.className = "tiny-dragger-insert tiny-dragger-insert-below";
-  below.setAttribute("aria-label", t("handle.insertBelow"));
-  below.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    handlers.onInsertBelow(event);
-  });
-
-  root.append(above, grip, below);
+  root.append(grip);
   return root;
 }

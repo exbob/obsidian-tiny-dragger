@@ -27,7 +27,6 @@ Works in **Source mode** and **Live Preview**. Reading view has no handles.
 Hover a block. A handle appears in the left gutter:
 
 - **Four dots** in a square: click to open the block menu; press and drag to move the block.
-- **Short lines** above and below: hover to turn them into pluses; click to insert a blank line above or below.
 
 ### Drag
 

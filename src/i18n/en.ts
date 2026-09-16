@@ -29,8 +29,6 @@ export const en: Record<MessageKey, string> = {
   "menu.copy": "Copy block",
   "menu.cut": "Cut block",
   "menu.delete": "Delete block",
-  "handle.insertAbove": "Insert blank line above",
-  "handle.insertBelow": "Insert blank line below",
   "handle.grip": "Drag block",
   "notice.convertFailed": "Could not convert this block: {detail}",
   "notice.copyFailed": "Could not copy this block",

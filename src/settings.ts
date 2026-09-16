@@ -1,6 +1,7 @@
 import {
   DEFAULT_HANDLE_COLOR,
   HANDLE_GUTTER_GAP_PX,
+  HANDLE_GRIP_PAD_PX,
   HANDLE_OFFSET_DEFAULT,
   HANDLE_OFFSET_MAX,
   HANDLE_OFFSET_MIN,
@@ -33,7 +34,7 @@ export function handleCssColor(settings: TinyDraggerSettings): string {
 }
 
 export function handleCssOffset(settings: TinyDraggerSettings): string {
-  return `${settings.handleOffset - settings.handleSize - HANDLE_GUTTER_GAP_PX}px`;
+  return `${settings.handleOffset - settings.handleSize - HANDLE_GRIP_PAD_PX - HANDLE_GUTTER_GAP_PX}px`;
 }
 
 const HEX_COLOR = /^#([0-9a-fA-F]{6})$/;

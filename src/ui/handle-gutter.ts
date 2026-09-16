@@ -6,13 +6,8 @@ import {
   type EditorView,
 } from "@codemirror/view";
 import { blockAtLine } from "../engine/blocks";
-import { planInsertBlankLine } from "../engine/insert-line";
 import { dragSourceField, type DragSession } from "../services/drag-session";
-import {
-  dispatchChanges,
-  docFromView,
-  readTabSize,
-} from "../services/editor-host";
+import { docFromView, readTabSize } from "../services/editor-host";
 import { type TinyDraggerSettings } from "../settings";
 import { applyHandleAppearance, createHandleElement } from "./handle-dom";
 
@@ -64,8 +59,6 @@ class HandleGutterMarker extends GutterMarker {
         }
         this.session.onGripPointerDown(view, block, event);
       },
-      onInsertAbove: () => insertBlank(view, this.startLine, "above"),
-      onInsertBelow: () => insertBlank(view, this.startLine, "below"),
     });
     root.classList.add("is-visible");
     applyHandleAppearance(root, this.getSettings());
@@ -79,19 +72,6 @@ class HandleSpacerMarker extends GutterMarker {
     spacer.className = "tiny-dragger-gutter-spacer";
     return spacer;
   }
-}
-
-function insertBlank(
-  view: EditorView,
-  startLine: number,
-  where: "above" | "below",
-): void {
-  const doc = docFromView(view);
-  const block = blockAtLine(doc, startLine, readTabSize(view));
-  if (block === null) {
-    return;
-  }
-  dispatchChanges(view, [planInsertBlankLine(doc, block, where)]);
 }
 
 function applyHandleCssVars(view: EditorView, settings: TinyDraggerSettings): void {

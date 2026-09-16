@@ -11,27 +11,20 @@ import {
 function noopHandlers() {
   return {
     onGripPointerDown: vi.fn(),
-    onInsertAbove: vi.fn(),
-    onInsertBelow: vi.fn(),
   };
 }
 
 describe("createHandleElement", () => {
-  it("routes grip pointerdown and insert clicks separately", () => {
+  it("routes grip pointerdown and has no insert lines", () => {
     setLocaleForTests("en");
     const handlers = noopHandlers();
     const root = createHandleElement(handlers);
     expect(root.className).toContain("tiny-dragger-handle");
     const grip = root.querySelector(".tiny-dragger-grip") as HTMLElement;
-    const above = root.querySelector(".tiny-dragger-insert-above") as HTMLElement;
-    const below = root.querySelector(".tiny-dragger-insert-below") as HTMLElement;
+    expect(root.querySelector(".tiny-dragger-insert")).toBeNull();
     expect(grip.getAttribute("aria-label")).toBe("Drag block");
     grip.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
-    above.click();
-    below.click();
     expect(handlers.onGripPointerDown).toHaveBeenCalledTimes(1);
-    expect(handlers.onInsertAbove).toHaveBeenCalledTimes(1);
-    expect(handlers.onInsertBelow).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -60,7 +53,7 @@ describe("applyHandleAppearance", () => {
     const el = document.createElement("div");
     applyHandleAppearance(el, DEFAULT_SETTINGS);
     expect(el.style.getPropertyValue("--tiny-dragger-handle-offset")).toBe(
-      "-28px",
+      "-30px",
     );
   });
 });
@@ -102,5 +95,48 @@ describe("handle icon paint", () => {
     );
     expect(css).toMatch(/\.tiny-dragger-gutter\s*\{[^}]*width:\s*0/);
     expect(css).toMatch(/\.tiny-dragger-gutter\s*\{[^}]*position:\s*absolute/);
+  });
+
+  it("vertically centers the handle on the first text line", () => {
+    const css = readFileSync(
+      path.resolve(__dirname, "../../styles.css"),
+      "utf8",
+    );
+    expect(css).toMatch(
+      /translateY\(\s*calc\(\s*0\.5lh\s*-\s*50%\s*\)\s*\)/,
+    );
+  });
+
+  it("does not keep insert-line styles on the handle", () => {
+    const css = readFileSync(
+      path.resolve(__dirname, "../../styles.css"),
+      "utf8",
+    );
+    expect(css).not.toMatch(/tiny-dragger-insert/);
+  });
+
+  it("draws larger, tighter grip dots", () => {
+    const css = readFileSync(
+      path.resolve(__dirname, "../../styles.css"),
+      "utf8",
+    );
+    expect(css).not.toMatch(/\.tiny-dragger-dot\s*\{[^}]*width:\s*22%/);
+    expect(css).toMatch(
+      /\.tiny-dragger-dot\s*\{[^}]*width:\s*calc\(\s*var\(--tiny-dragger-handle-size/,
+    );
+    expect(css).toMatch(/\.tiny-dragger-grip\s*\{[^}]*gap:/);
+  });
+
+  it("uses a muted gray background on grip hover instead of a border", () => {
+    const css = readFileSync(
+      path.resolve(__dirname, "../../styles.css"),
+      "utf8",
+    );
+    expect(css).not.toMatch(
+      /\.tiny-dragger-grip:hover[^{]*\{[^}]*border-color:/,
+    );
+    expect(css).toMatch(
+      /\.tiny-dragger-grip:hover[^{]*\{[^}]*background:\s*color-mix/,
+    );
   });
 });

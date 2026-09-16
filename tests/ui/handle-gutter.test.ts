@@ -88,7 +88,7 @@ describe("handle gutter hover", () => {
   it("does not reserve layout space beside the text", () => {
     const { view } = mount();
     expect(view.dom.style.getPropertyValue("--tiny-dragger-handle-offset")).toBe(
-      "-28px",
+      "-30px",
     );
   });
 

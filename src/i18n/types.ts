@@ -26,8 +26,6 @@ export const MESSAGE_KEYS = [
   "menu.copy",
   "menu.cut",
   "menu.delete",
-  "handle.insertAbove",
-  "handle.insertBelow",
   "handle.grip",
   "notice.convertFailed",
   "notice.copyFailed",

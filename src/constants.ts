@@ -10,6 +10,7 @@ export const HANDLE_OFFSET_MIN = -80;
 export const HANDLE_OFFSET_MAX = 80;
 export const HANDLE_OFFSET_DEFAULT = 0;
 export const HANDLE_GUTTER_GAP_PX = 8;
+export const HANDLE_GRIP_PAD_PX = 2;
 export const DEFAULT_HANDLE_COLOR = "#888888";
 export const AUTO_SCROLL_EDGE_PX = 28;
 export const AUTO_SCROLL_MAX_SPEED_PX = 18;

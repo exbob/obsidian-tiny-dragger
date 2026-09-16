@@ -28,8 +28,6 @@ export const zh: Record<MessageKey, string> = {
   "menu.copy": "复制块",
   "menu.cut": "剪切块",
   "menu.delete": "删除块",
-  "handle.insertAbove": "在上方插入空行",
-  "handle.insertBelow": "在下方插入空行",
   "handle.grip": "拖拽块",
   "notice.convertFailed": "无法转换该块：{detail}",
   "notice.copyFailed": "无法复制该块",
