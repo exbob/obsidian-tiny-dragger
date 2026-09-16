@@ -25,6 +25,14 @@ export const DEFAULT_SETTINGS: TinyDraggerSettings = {
   handleOffset: HANDLE_OFFSET_DEFAULT,
 };
 
+export const THEME_HANDLE_COLOR = "var(--interactive-accent)";
+
+export function handleCssColor(settings: TinyDraggerSettings): string {
+  return settings.handleColorMode === "custom"
+    ? settings.handleColor
+    : THEME_HANDLE_COLOR;
+}
+
 const HEX_COLOR = /^#([0-9a-fA-F]{6})$/;
 
 function evenInRange(

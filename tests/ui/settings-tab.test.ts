@@ -21,5 +21,26 @@ describe("TinyDraggerSettingTab", () => {
     expect(names.join("\n")).toContain("Handle color");
     expect(names.join("\n")).toContain("Handle side");
     expect(names.join("\n")).toContain("Handle horizontal offset");
+    expect(tab.containerEl.querySelector('input[type="color"]')).toBeNull();
+  });
+
+  it("shows a color picker with the current color only in custom mode", () => {
+    setLocaleForTests("en");
+    const plugin = new TinyDraggerPlugin(
+      {} as never,
+      { id: "tiny-dragger" } as never,
+    );
+    plugin.settings = {
+      ...DEFAULT_SETTINGS,
+      handleColorMode: "custom",
+      handleColor: "#aabbcc",
+    };
+    const tab = new TinyDraggerSettingTab({} as never, plugin);
+    tab.display();
+    const picker = tab.containerEl.querySelector(
+      'input[type="color"]',
+    ) as HTMLInputElement | null;
+    expect(picker).not.toBeNull();
+    expect(picker?.value).toBe("#aabbcc");
   });
 });

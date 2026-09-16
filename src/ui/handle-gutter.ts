@@ -13,8 +13,8 @@ import {
   docFromView,
   readTabSize,
 } from "../services/editor-host";
-import type { TinyDraggerSettings } from "../settings";
-import { createHandleElement } from "./handle-dom";
+import { type TinyDraggerSettings } from "../settings";
+import { applyHandleAppearance, createHandleElement } from "./handle-dom";
 
 const liveViews = new Set<EditorView>();
 
@@ -42,6 +42,7 @@ class HandleGutterMarker extends GutterMarker {
   constructor(
     private readonly startLine: number,
     private readonly session: DragSession,
+    private readonly getSettings: () => TinyDraggerSettings,
   ) {
     super();
   }
@@ -67,6 +68,7 @@ class HandleGutterMarker extends GutterMarker {
       onInsertBelow: () => insertBlank(view, this.startLine, "below"),
     });
     root.classList.add("is-visible");
+    applyHandleAppearance(root, this.getSettings());
     return root;
   }
 }
@@ -95,17 +97,10 @@ function insertBlank(
 }
 
 function applyHandleCssVars(view: EditorView, settings: TinyDraggerSettings): void {
-  view.dom.style.setProperty("--tiny-dragger-handle-size", `${settings.handleSize}px`);
-  view.dom.style.setProperty(
-    "--tiny-dragger-handle-color",
-    settings.handleColorMode === "custom"
-      ? settings.handleColor
-      : "var(--text-muted)",
-  );
-  view.dom.style.setProperty(
-    "--tiny-dragger-handle-offset",
-    `${settings.handleOffset}px`,
-  );
+  applyHandleAppearance(view.dom, settings);
+  view.dom
+    .querySelectorAll<HTMLElement>(".tiny-dragger-handle")
+    .forEach((el) => applyHandleAppearance(el, settings));
 }
 
 function hoveredStartLineAt(view: EditorView, event: MouseEvent): number | null {
@@ -184,7 +179,7 @@ export function handleGutterExtension(config: HandleGutterConfig): Extension {
         if (lineNumber !== hovered) {
           return null;
         }
-        return new HandleGutterMarker(hovered, config.session);
+        return new HandleGutterMarker(hovered, config.session, config.getSettings);
       },
       lineMarkerChange: (update) =>
         update.startState.field(hoveredStartLineField) !==

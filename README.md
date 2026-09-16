@@ -47,7 +47,7 @@ Under Obsidian **Settings → Tiny Dragger**:
 | Setting | Description | Default |
 | ------- | ----------- | ------- |
 | Handle size | 12–28 px, step 2 | 20 |
-| Handle color | Theme muted color, or a custom hex color | Theme |
+| Handle color | Theme accent, or a custom color picker | Theme |
 | Handle side | Left or right gutter | Left |
 | Handle horizontal offset | −80 to 80 px | 0 |
 

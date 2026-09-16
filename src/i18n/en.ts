@@ -5,7 +5,7 @@ export const en: Record<MessageKey, string> = {
   "setting.handleSizeDesc": "Size of the hover handle, 12–28 px.",
   "setting.handleColorName": "Handle color",
   "setting.handleColorDesc":
-    "Follow the theme muted color, or pick a hex color.",
+    "Follow the theme accent color, or pick a custom color.",
   "setting.handleColorTheme": "Theme",
   "setting.handleColorCustom": "Custom",
   "setting.handleColorHex": "Custom color",

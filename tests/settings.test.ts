@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_SETTINGS, normalizeSettings } from "../src/settings";
+import {
+  DEFAULT_SETTINGS,
+  handleCssColor,
+  normalizeSettings,
+  THEME_HANDLE_COLOR,
+} from "../src/settings";
 
 describe("normalizeSettings", () => {
   it("returns defaults for invalid payloads", () => {
@@ -34,5 +39,22 @@ describe("normalizeSettings", () => {
         handleColor: "red",
       }).handleColor,
     ).toBe(DEFAULT_SETTINGS.handleColor);
+  });
+});
+
+describe("handleCssColor", () => {
+  it("uses the theme accent variable by default", () => {
+    expect(handleCssColor(DEFAULT_SETTINGS)).toBe(THEME_HANDLE_COLOR);
+    expect(THEME_HANDLE_COLOR).toBe("var(--interactive-accent)");
+  });
+
+  it("uses the stored hex in custom mode", () => {
+    expect(
+      handleCssColor({
+        ...DEFAULT_SETTINGS,
+        handleColorMode: "custom",
+        handleColor: "#aabbcc",
+      }),
+    ).toBe("#aabbcc");
   });
 });

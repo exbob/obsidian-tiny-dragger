@@ -73,6 +73,16 @@ describe("handle gutter hover", () => {
     expect(visibleHandle(view)).toBeNull();
   });
 
+  it("applies the handle color variable onto the visible handle", () => {
+    const { view } = mount();
+    hoverContent(view);
+    const handle = visibleHandle(view);
+    expect(handle).not.toBeNull();
+    expect(handle!.style.getPropertyValue("--tiny-dragger-handle-color")).toBe(
+      "var(--interactive-accent)",
+    );
+  });
+
   it("does not clear hover while a drag session is active", () => {
     const { view, session } = mount();
     hoverContent(view);

@@ -4,7 +4,7 @@ export const zh: Record<MessageKey, string> = {
   "setting.handleSizeName": "手柄大小",
   "setting.handleSizeDesc": "悬停手柄的尺寸，12～28 像素。",
   "setting.handleColorName": "手柄颜色",
-  "setting.handleColorDesc": "跟随主题次要文字颜色，或指定十六进制颜色。",
+  "setting.handleColorDesc": "跟随主题色，或自定义颜色。",
   "setting.handleColorTheme": "主题",
   "setting.handleColorCustom": "自定义",
   "setting.handleColorHex": "自定义颜色",

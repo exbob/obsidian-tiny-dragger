@@ -36,7 +36,7 @@ export class TinyDraggerSettingTab extends PluginSettingTab {
           });
       });
 
-    new Setting(containerEl)
+    const colorSetting = new Setting(containerEl)
       .setName(t("setting.handleColorName"))
       .setDesc(t("setting.handleColorDesc"))
       .addDropdown((dropdown) => {
@@ -48,17 +48,21 @@ export class TinyDraggerSettingTab extends PluginSettingTab {
             this.plugin.settings.handleColorMode =
               value === "custom" ? "custom" : "theme";
             await this.plugin.saveSettings();
-          });
-      })
-      .addText((text) => {
-        text
-          .setPlaceholder("#888888")
-          .setValue(this.plugin.settings.handleColor)
-          .onChange(async (value) => {
-            this.plugin.settings.handleColor = value;
-            await this.plugin.saveSettings();
+            this.display();
           });
       });
+
+    if (this.plugin.settings.handleColorMode === "custom") {
+      const picker = document.createElement("input");
+      picker.type = "color";
+      picker.value = this.plugin.settings.handleColor;
+      picker.setAttribute("aria-label", t("setting.handleColorHex"));
+      picker.addEventListener("input", () => {
+        this.plugin.settings.handleColor = picker.value;
+        void this.plugin.saveSettings();
+      });
+      colorSetting.controlEl.append(picker);
+    }
 
     new Setting(containerEl)
       .setName(t("setting.handleSideName"))
