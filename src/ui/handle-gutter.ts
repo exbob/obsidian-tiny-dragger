@@ -24,6 +24,7 @@ export function forEachLiveEditorView(callback: (view: EditorView) => void): voi
 }
 
 const setHoveredStartLine = StateEffect.define<number | null>();
+const setPinnedStartLine = StateEffect.define<number | null>();
 
 const hoveredStartLineField = StateField.define<number | null>({
   create: () => null,
@@ -36,6 +37,36 @@ const hoveredStartLineField = StateField.define<number | null>({
     return value;
   },
 });
+
+const pinnedStartLineField = StateField.define<number | null>({
+  create: () => null,
+  update(value, tr) {
+    for (const effect of tr.effects) {
+      if (effect.is(setPinnedStartLine)) {
+        return effect.value;
+      }
+    }
+    return value;
+  },
+});
+
+export function pinHandleStartLine(
+  view: EditorView,
+  startLine: number | null,
+): void {
+  const effects = [setPinnedStartLine.of(startLine)];
+  if (startLine !== null) {
+    effects.push(setHoveredStartLine.of(startLine));
+  }
+  view.dispatch({ effects });
+}
+
+function activeHandleStartLine(view: EditorView): number | null {
+  return (
+    view.state.field(pinnedStartLineField) ??
+    view.state.field(hoveredStartLineField)
+  );
+}
 
 class HandleGutterMarker extends GutterMarker {
   constructor(
@@ -149,6 +180,9 @@ export function handleGutterExtension(config: HandleGutterConfig): Extension {
         liveViews.add(view);
         applyHandleCssVars(view, config.getSettings());
         this.onMouseMove = (event: MouseEvent) => {
+          if (view.state.field(pinnedStartLineField) !== null) {
+            return;
+          }
           const next = hoveredStartLineAt(view, event);
           if (next === null) {
             return;
@@ -158,7 +192,10 @@ export function handleGutterExtension(config: HandleGutterConfig): Extension {
           }
         };
         this.onMouseLeave = () => {
-          if (config.session.isDragSessionActive()) {
+          if (
+            config.session.isDragSessionActive() ||
+            view.state.field(pinnedStartLineField) !== null
+          ) {
             return;
           }
           if (view.state.field(hoveredStartLineField) !== null) {
@@ -184,25 +221,28 @@ export function handleGutterExtension(config: HandleGutterConfig): Extension {
   return [
     dragSourceField,
     hoveredStartLineField,
+    pinnedStartLineField,
     hoverPlugin,
     gutter({
       class: "tiny-dragger-gutter",
       side: "before",
       initialSpacer: () => new HandleSpacerMarker(),
       lineMarker(view, line) {
-        const hovered = view.state.field(hoveredStartLineField);
-        if (hovered === null) {
+        const active = activeHandleStartLine(view);
+        if (active === null) {
           return null;
         }
         const lineNumber = view.state.doc.lineAt(line.from).number;
-        if (lineNumber !== hovered) {
+        if (lineNumber !== active) {
           return null;
         }
-        return new HandleGutterMarker(hovered, config.session, config.getSettings);
+        return new HandleGutterMarker(active, config.session, config.getSettings);
       },
       lineMarkerChange: (update) =>
         update.startState.field(hoveredStartLineField) !==
-        update.state.field(hoveredStartLineField),
+          update.state.field(hoveredStartLineField) ||
+        update.startState.field(pinnedStartLineField) !==
+          update.state.field(pinnedStartLineField),
     }),
   ];
 }

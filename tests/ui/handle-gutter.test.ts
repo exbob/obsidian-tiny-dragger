@@ -5,7 +5,7 @@ import { blockAtLine } from "../../src/engine/blocks";
 import { docFromView } from "../../src/services/editor-host";
 import { DragSession } from "../../src/services/drag-session";
 import { DEFAULT_SETTINGS } from "../../src/settings";
-import { handleGutterExtension } from "../../src/ui/handle-gutter";
+import { handleGutterExtension, pinHandleStartLine } from "../../src/ui/handle-gutter";
 
 function visibleHandle(view: EditorView): HTMLElement | null {
   return view.dom.querySelector(".tiny-dragger-handle.is-visible");
@@ -138,5 +138,24 @@ describe("handle gutter hover", () => {
     view.dom.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
     expect(visibleHandle(view)).not.toBeNull();
     session.cancel();
+  });
+
+  it("keeps the pinned handle while the pointer moves to another block", () => {
+    const { view } = mount();
+    hoverContent(view);
+    expect(visibleHandle(view)?.dataset.startLine).toBe("1");
+    pinHandleStartLine(view, 1);
+    vi.spyOn(view, "posAtCoords").mockReturnValue(
+      view.state.doc.line(3).from,
+    );
+    view.contentDOM.dispatchEvent(
+      new MouseEvent("mousemove", { bubbles: true, clientX: 8, clientY: 40 }),
+    );
+    expect(visibleHandle(view)?.dataset.startLine).toBe("1");
+    view.dom.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
+    expect(visibleHandle(view)?.dataset.startLine).toBe("1");
+    pinHandleStartLine(view, null);
+    view.dom.dispatchEvent(new MouseEvent("mouseleave", { bubbles: false }));
+    expect(visibleHandle(view)).toBeNull();
   });
 });

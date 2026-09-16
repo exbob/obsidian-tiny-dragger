@@ -10,6 +10,7 @@ import { openBlockMenu } from "./ui/block-menu";
 import {
   forEachLiveEditorView,
   handleGutterExtension,
+  pinHandleStartLine,
 } from "./ui/handle-gutter";
 import { TinyDraggerSettingTab } from "./ui/settings-tab";
 
@@ -24,7 +25,14 @@ export default class TinyDraggerPlugin extends Plugin {
     this.session = new DragSession({
       getSettings: () => this.settings,
       onGripClick: (view, block, event) => {
-        openBlockMenu({ view, block, event, settings: this.settings });
+        pinHandleStartLine(view, block.lines.startLine);
+        openBlockMenu({
+          view,
+          block,
+          event,
+          settings: this.settings,
+          onClose: () => pinHandleStartLine(view, null),
+        });
       },
     });
     this.syncEditorExtensions();

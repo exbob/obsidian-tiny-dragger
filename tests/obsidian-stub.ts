@@ -132,6 +132,19 @@ export class Menu {
 
   showAtMouseEvent(_event: MouseEvent): void {}
   showAtPosition(_position: { x: number; y: number }): void {}
+
+  onHide(callback: () => unknown): void {
+    this.hideCallbacks.push(callback);
+  }
+
+  hide(): this {
+    for (const callback of this.hideCallbacks.splice(0)) {
+      callback();
+    }
+    return this;
+  }
+
+  private readonly hideCallbacks: Array<() => unknown> = [];
 }
 
 export class SettingTab {

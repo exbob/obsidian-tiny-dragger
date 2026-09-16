@@ -232,4 +232,29 @@ describe("openBlockMenu", () => {
     await clickItem(menu, "Cut block");
     expect(noticeStub().messages).toContain("Could not cut this block");
   });
+
+  it("invokes onClose when the menu hides", () => {
+    const text = "hello\n";
+    const { view } = createView(text);
+    const block = blockAtLine(docFromText(text), 1, 4)!;
+    const onClose = vi.fn();
+    const shown: Menu[] = [];
+    const spy = vi
+      .spyOn(Menu.prototype, "showAtMouseEvent")
+      .mockImplementation(function (this: Menu) {
+        shown.push(this);
+        return this;
+      });
+    openBlockMenu({
+      view,
+      block,
+      event: new MouseEvent("click"),
+      onClose,
+    });
+    spy.mockRestore();
+    expect(shown[0]).toBeTruthy();
+    expect(onClose).not.toHaveBeenCalled();
+    shown[0]!.hide();
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });

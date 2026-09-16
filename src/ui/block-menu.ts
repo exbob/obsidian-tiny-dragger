@@ -129,11 +129,15 @@ export function openBlockMenu(params: {
   block: Block;
   event: MouseEvent;
   settings?: unknown;
+  onClose?: () => void;
 }): void {
   const menu = new Menu();
   populateBlockMenu(menu, (action) =>
     runBlockMenuAction(params.view, params.block, action),
   );
+  if (params.onClose !== undefined) {
+    menu.onHide(params.onClose);
+  }
   menu.showAtMouseEvent(params.event);
 }
 
