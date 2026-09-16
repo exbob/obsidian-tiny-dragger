@@ -1,9 +1,10 @@
 import { selectOne } from "md-dragger/domain";
 import { describe, expect, it } from "vitest";
 import { applyTextChanges } from "../../src/engine/apply";
-import { blockAtLine } from "../../src/engine/blocks";
+import { blockAtLine, collectBlocks } from "../../src/engine/blocks";
 import { docFromText } from "../../src/engine/doc";
 import { planBlockMove } from "../../src/engine/move";
+import { resolveDragPayload } from "../../src/engine/payload";
 
 describe("planBlockMove", () => {
   it("moves a paragraph below the next block without changing indent on small dx", () => {
@@ -88,5 +89,44 @@ describe("planBlockMove", () => {
     );
     expect(next).toMatch(/^ {4}- d/m);
     expect(next).not.toMatch(/^ {8,}- d/m);
+  });
+
+  it("moves only the gripped parent list row and leaves nested children behind", () => {
+    const text = `- 选项1
+- 选项2
+- 选项3
+    - 选项1-1
+    - 选项1-2
+    - 选项1-3
+`;
+    const doc = docFromText(text);
+    const origin = collectBlocks(doc, 4).find((block) => block.lines.startLine === 3)!;
+    const selection = resolveDragPayload({
+      doc,
+      tabSize: 4,
+      origin,
+      selection: { fromLine: 1, toLine: 1, collapsed: true },
+    });
+    const edits = planBlockMove({
+      doc,
+      selection,
+      hitLine: 1,
+      belowMid: false,
+      dx: 0,
+      tabSize: 4,
+      indentUnit: 4,
+    });
+    expect(edits).not.toBeNull();
+    const next = edits!.reduce(
+      (current, edit) => applyTextChanges(current, edit.changes),
+      text,
+    );
+    expect(next).toBe(`- 选项3
+- 选项1
+- 选项2
+    - 选项1-1
+    - 选项1-2
+    - 选项1-3
+`);
   });
 });
