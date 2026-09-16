@@ -1,7 +1,8 @@
+import { selectBlocks, type TextChange } from "md-dragger/domain";
 import { describe, expect, it } from "vitest";
 import { applyTextChanges } from "../../src/engine/apply";
-import { blockAtLine } from "../../src/engine/blocks";
-import { planBlockConvert } from "../../src/engine/convert";
+import { blockAtLine, collectBlocks } from "../../src/engine/blocks";
+import { planBlockConvert, planSelectionConvert } from "../../src/engine/convert";
 import { docFromText } from "../../src/engine/doc";
 
 const TAB_SIZE = 4;
@@ -50,5 +51,47 @@ describe("planBlockConvert", () => {
     expect(next).toContain("hello");
     expect(next).toMatch(/\nnext\n?$/);
     expect(next).not.toMatch(/^>\s*next/m);
+  });
+});
+
+describe("planSelectionConvert", () => {
+  it("converts every selected block independently", () => {
+    const text = "alpha\n\nbravo\n";
+    const doc = docFromText(text);
+    const blocks = collectBlocks(doc, TAB_SIZE);
+    const planned = planSelectionConvert(
+      doc,
+      selectBlocks(blocks),
+      { kind: "heading", level: 1 },
+    );
+    expect(planned).not.toBe("noop");
+    const next = applyTextChanges(text, planned as TextChange[]);
+    expect(next).toMatch(/^# alpha/m);
+    expect(next).toMatch(/^# bravo/m);
+  });
+
+  it("skips blocks that are already the target type", () => {
+    const text = "# alpha\n\nbravo\n";
+    const doc = docFromText(text);
+    const blocks = collectBlocks(doc, TAB_SIZE);
+    const planned = planSelectionConvert(
+      doc,
+      selectBlocks(blocks),
+      { kind: "heading", level: 1 },
+    );
+    expect(planned).not.toBe("noop");
+    const next = applyTextChanges(text, planned as TextChange[]);
+    expect(next).toMatch(/^# alpha/m);
+    expect(next).toMatch(/^# bravo/m);
+    expect(next.match(/^# /gm)?.length).toBe(2);
+  });
+
+  it("returns noop when every block is already the target", () => {
+    const text = "alpha\n\nbravo\n";
+    const doc = docFromText(text);
+    const blocks = collectBlocks(doc, TAB_SIZE);
+    expect(
+      planSelectionConvert(doc, selectBlocks(blocks), { kind: "paragraph" }),
+    ).toBe("noop");
   });
 });

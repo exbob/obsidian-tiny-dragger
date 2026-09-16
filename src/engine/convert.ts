@@ -2,6 +2,7 @@ import {
   BlockType,
   planConvert,
   type Block,
+  type BlockSelection,
   type ConvertTo,
   type Doc,
   type TextChange,
@@ -124,4 +125,19 @@ export function planBlockConvert(
     return "noop";
   }
   return planned;
+}
+
+export function planSelectionConvert(
+  doc: Doc,
+  selection: BlockSelection,
+  request: ConvertRequest,
+): TextChange[] | "noop" {
+  const changes: TextChange[] = [];
+  for (const block of selection.blocks) {
+    const planned = planBlockConvert(doc, block, request);
+    if (planned !== "noop") {
+      changes.push(...planned);
+    }
+  }
+  return changes.length === 0 ? "noop" : changes;
 }
