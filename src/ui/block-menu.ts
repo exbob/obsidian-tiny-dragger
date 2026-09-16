@@ -104,6 +104,8 @@ export function populateBlockMenu(
     item.onClick(() => onAction({ kind: "math" }));
   });
 
+  menu.addSeparator();
+
   menu.addItem((item) => {
     item.setTitle(t("menu.copy"));
     item.setIcon("copy");

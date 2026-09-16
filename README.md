@@ -24,20 +24,22 @@ Works in **Source mode** and **Live Preview**. Reading view has no handles.
 
 ### Handle
 
-Hover a block. A handle appears in the left gutter:
+Hover a block. A four-dot handle appears over the left gutter (it does not shrink the text column):
 
-- **Four dots** in a square: click to open the block menu; press and drag to move the block.
+- **Click** the dots to open the block menu. The handle stays on that block until the menu closes.
+- **Press and drag** the dots to move the block.
 
 ### Drag
 
 - **Single block:** do not select text. Hover the four dots, hold the left button, and drag.
 - **Multiple blocks:** select the text of several blocks with the editor’s native selection, then drag from the four-dot handle of a block **inside** that selection. Dragging from a handle outside the selection moves only that one block.
-- **Nesting:** while dragging lists, quotes, or callouts, move horizontally to change indent. A mostly vertical drag keeps the original indent.
+- **Lists:** each list row moves on its own. Nested children are not taken unless you select those rows too. Selecting several nested rows (for example three indented items) moves them together.
+- **Nesting:** while dragging lists, quotes, or callouts, move horizontally to change indent. The drop guide shifts with the target indent. A mostly vertical drag keeps the original indent.
 - Press **Escape** to cancel.
 
 ### Block menu
 
-Click the four dots (without dragging) to convert the **current** block to paragraph, H1–H6, bulleted / numbered / task list, quote, `[!info]` / `[!warning]` / `[!danger]` / `[!example]`, code block, or math block, or to copy, cut, or delete it. Same-type conversions do nothing. The menu does not convert a multi-block selection as a group.
+Click the four dots (without dragging) to convert the **current** block to paragraph, H1–H6, bulleted / numbered / task list, quote, `[!info]` / `[!warning]` / `[!danger]` / `[!example]`, code block, or math block — or, below a separator, to copy, cut, or delete it. Same-type conversions do nothing. The menu does not convert a multi-block selection as a group.
 
 ## Settings
 

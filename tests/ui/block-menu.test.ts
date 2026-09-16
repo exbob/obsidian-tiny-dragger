@@ -136,6 +136,22 @@ describe("populateBlockMenu", () => {
     expect(del?.kind === "item" && del.item.icon).toBe("trash-2");
   });
 
+  it("separates convert actions from clipboard actions", () => {
+    setLocaleForTests("en");
+    const menu = asStubMenu(new Menu());
+    populateBlockMenu(menu, vi.fn());
+    const mathIndex = menu.entries.findIndex(
+      (entry) => entry.kind === "item" && entry.item.title === "Math block",
+    );
+    const copyIndex = menu.entries.findIndex(
+      (entry) => entry.kind === "item" && entry.item.title === "Copy block",
+    );
+    expect(mathIndex).toBeGreaterThan(-1);
+    expect(copyIndex).toBeGreaterThan(mathIndex);
+    expect(menu.entries[mathIndex + 1]?.kind).toBe("separator");
+    expect(copyIndex).toBe(mathIndex + 2);
+  });
+
   it("nests heading list and quote conversions in submenus", () => {
     setLocaleForTests("en");
     const menu = asStubMenu(new Menu());
