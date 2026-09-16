@@ -20,6 +20,7 @@
     "happy-dom": "latest",
     "obsidian": "latest",
     "typescript": "latest",
+    "vite": "^8.3.0",
     "vitest": "latest"
   }
 }
