@@ -1,4 +1,5 @@
 import type { EditorView } from "@codemirror/view";
+import type {} from "obsidian";
 
 export class DropIndicator {
   private element: HTMLElement | null = null;
@@ -10,10 +11,8 @@ export class DropIndicator {
       return;
     }
     this.detach();
-    const element = document.createElement("div");
-    element.className = "tiny-dragger-drop-line";
+    const element = host.createEl("div", { cls: "tiny-dragger-drop-line" });
     element.hidden = true;
-    host.append(element);
     this.host = host;
     this.element = element;
   }
@@ -23,9 +22,11 @@ export class DropIndicator {
       return;
     }
     this.element.hidden = false;
-    this.element.style.top = `${y}px`;
-    this.element.style.left = `${Math.max(0, leftPx)}px`;
-    this.element.style.right = "0px";
+    this.element.setCssStyles({
+      top: `${y}px`,
+      left: `${Math.max(0, leftPx)}px`,
+      right: "0px",
+    });
   }
 
   hide(): void {

@@ -1,3 +1,4 @@
+import type {} from "obsidian";
 import { t } from "../i18n";
 import { handleCssColor, handleCssOffset, type TinyDraggerSettings } from "../settings";
 
@@ -9,9 +10,11 @@ export function applyHandleAppearance(
   el: HTMLElement,
   settings: TinyDraggerSettings,
 ): void {
-  el.style.setProperty("--tiny-dragger-handle-size", `${settings.handleSize}px`);
-  el.style.setProperty("--tiny-dragger-handle-color", handleCssColor(settings));
-  el.style.setProperty("--tiny-dragger-handle-offset", handleCssOffset(settings));
+  el.setCssProps({
+    "--tiny-dragger-handle-size": `${settings.handleSize}px`,
+    "--tiny-dragger-handle-color": handleCssColor(settings),
+    "--tiny-dragger-handle-offset": handleCssOffset(settings),
+  });
 }
 
 export function applyHandleLineAlign(
@@ -26,31 +29,29 @@ export function applyHandleLineAlign(
     el.style.removeProperty("--tiny-dragger-handle-nudge-y");
     return;
   }
-  el.style.setProperty(
-    "--tiny-dragger-handle-nudge-y",
-    `calc(${firstLineHeightPx / 2}px - 50%)`,
-  );
+  el.setCssProps({
+    "--tiny-dragger-handle-nudge-y": `calc(${firstLineHeightPx / 2}px - 50%)`,
+  });
 }
 
 export function createHandleElement(handlers: HandleDomHandlers): HTMLElement {
-  const root = document.createElement("div");
-  root.className = "tiny-dragger-handle";
+  const root = createEl("div", { cls: "tiny-dragger-handle" });
 
-  const grip = document.createElement("button");
-  grip.type = "button";
-  grip.className = "tiny-dragger-grip";
-  grip.setAttribute("aria-label", t("handle.grip"));
+  const grip = root.createEl("button", {
+    cls: "tiny-dragger-grip",
+    attr: {
+      type: "button",
+      "aria-label": t("handle.grip"),
+    },
+  });
   grip.addEventListener("pointerdown", (event) => {
     event.preventDefault();
     event.stopPropagation();
     handlers.onGripPointerDown(event);
   });
   for (let i = 0; i < 4; i++) {
-    const dot = document.createElement("span");
-    dot.className = "tiny-dragger-dot";
-    grip.append(dot);
+    grip.createEl("span", { cls: "tiny-dragger-dot" });
   }
 
-  root.append(grip);
   return root;
 }

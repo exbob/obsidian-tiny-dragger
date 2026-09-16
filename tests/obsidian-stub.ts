@@ -1,3 +1,134 @@
+type DomElementInfo = {
+  cls?: string | string[];
+  text?: string | DocumentFragment;
+  attr?: Record<string, string | number | boolean | null>;
+  title?: string;
+  parent?: Node;
+  value?: string;
+  type?: string;
+  prepend?: boolean;
+  placeholder?: string;
+  href?: string;
+};
+
+function applyDomInfo(el: HTMLElement, o?: DomElementInfo | string): void {
+  const opts = typeof o === "string" ? { cls: o } : (o ?? {});
+  if (opts.cls !== undefined) {
+    el.className = Array.isArray(opts.cls) ? opts.cls.join(" ") : opts.cls;
+  }
+  if (opts.text !== undefined) {
+    if (typeof opts.text === "string") {
+      el.textContent = opts.text;
+    } else {
+      el.replaceChildren(opts.text);
+    }
+  }
+  if (opts.attr !== undefined) {
+    for (const [key, value] of Object.entries(opts.attr)) {
+      if (value === null) {
+        el.removeAttribute(key);
+      } else {
+        el.setAttribute(key, String(value));
+      }
+    }
+  }
+  if (opts.title !== undefined) {
+    el.title = opts.title;
+  }
+  if (opts.type !== undefined && "type" in el) {
+    (el as HTMLInputElement).type = opts.type;
+  }
+  if (opts.value !== undefined && "value" in el) {
+    (el as HTMLInputElement).value = opts.value;
+  }
+  if (opts.placeholder !== undefined && "placeholder" in el) {
+    (el as HTMLInputElement).placeholder = opts.placeholder;
+  }
+  if (opts.href !== undefined && "href" in el) {
+    (el as HTMLAnchorElement).href = opts.href;
+  }
+}
+
+export function createEl<K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  o?: DomElementInfo | string,
+  callback?: (el: HTMLElementTagNameMap[K]) => void,
+): HTMLElementTagNameMap[K] {
+  const el = document.createElement(tag);
+  applyDomInfo(el, o);
+  const parent = typeof o === "object" && o !== null ? o.parent : undefined;
+  if (parent !== undefined) {
+    if (typeof o === "object" && o?.prepend) {
+      parent.insertBefore(el, parent.firstChild);
+    } else {
+      parent.appendChild(el);
+    }
+  }
+  callback?.(el);
+  return el;
+}
+
+export function createDiv(
+  o?: DomElementInfo | string,
+  callback?: (el: HTMLDivElement) => void,
+): HTMLDivElement {
+  return createEl("div", o, callback);
+}
+
+export function createSpan(
+  o?: DomElementInfo | string,
+  callback?: (el: HTMLSpanElement) => void,
+): HTMLSpanElement {
+  return createEl("span", o, callback);
+}
+
+function installDomHelpers(): void {
+  const htmlProto = HTMLElement.prototype as HTMLElement & {
+    setCssStyles(styles: Partial<CSSStyleDeclaration>): void;
+    setCssProps(props: Record<string, string>): void;
+  };
+  if (htmlProto.setCssStyles === undefined) {
+    htmlProto.setCssStyles = function setCssStyles(
+      styles: Partial<CSSStyleDeclaration>,
+    ): void {
+      Object.assign(this.style, styles);
+    };
+  }
+  if (htmlProto.setCssProps === undefined) {
+    htmlProto.setCssProps = function setCssProps(
+      props: Record<string, string>,
+    ): void {
+      for (const [key, value] of Object.entries(props)) {
+        this.style.setProperty(key, value);
+      }
+    };
+  }
+
+  const nodeProto = Node.prototype as Node & {
+    createEl: typeof createEl;
+  };
+  if (nodeProto.createEl === undefined) {
+    nodeProto.createEl = function nodeCreateEl(tag, o, callback) {
+      const opts =
+        typeof o === "string"
+          ? { cls: o, parent: this }
+          : { ...(o ?? {}), parent: o?.parent ?? this };
+      return createEl(tag, opts, callback);
+    };
+  }
+
+  const globalTarget = globalThis as typeof globalThis & {
+    createEl: typeof createEl;
+    createDiv: typeof createDiv;
+    createSpan: typeof createSpan;
+  };
+  globalTarget.createEl = createEl;
+  globalTarget.createDiv = createDiv;
+  globalTarget.createSpan = createSpan;
+}
+
+installDomHelpers();
+
 export class Notice {
   static messages: string[] = [];
 
@@ -150,11 +281,28 @@ export class Menu {
 export class SettingTab {
   app: unknown;
   containerEl: HTMLElement;
+  settingItems: unknown[] = [];
 
   constructor(app: unknown) {
     this.app = app;
     this.containerEl = document.createElement("div");
   }
+
+  getSettingDefinitions(): unknown[] {
+    return [];
+  }
+
+  update(): void {
+    this.settingItems = this.getSettingDefinitions();
+  }
+
+  getControlValue(_key: string): unknown {
+    return undefined;
+  }
+
+  setControlValue(_key: string, _value: unknown): void {}
+
+  refreshDomState(): void {}
 
   display(): void {}
   hide(): void {}
@@ -166,6 +314,30 @@ export class PluginSettingTab extends SettingTab {
   constructor(app: unknown, plugin: Plugin) {
     super(app);
     this.plugin = plugin;
+  }
+
+  getControlValue(key: string): unknown {
+    const settings = (this.plugin as Plugin & { settings?: Record<string, unknown> })
+      .settings;
+    return settings?.[key];
+  }
+
+  async setControlValue(key: string, value: unknown): Promise<void> {
+    const plugin = this.plugin as Plugin & {
+      settings?: Record<string, unknown>;
+      saveSettings?: () => Promise<void>;
+      saveData?: (data: unknown) => Promise<void>;
+    };
+    if (plugin.settings !== undefined) {
+      plugin.settings[key] = value;
+    }
+    if (plugin.saveSettings !== undefined) {
+      await plugin.saveSettings();
+      return;
+    }
+    if (plugin.saveData !== undefined && plugin.settings !== undefined) {
+      await plugin.saveData(plugin.settings);
+    }
   }
 }
 
@@ -267,6 +439,37 @@ export class TextComponent {
   }
 }
 
+export class ColorComponent {
+  private value = "#000000";
+  private changeCallback: ((value: string) => unknown) | null = null;
+  readonly colorEl: HTMLInputElement;
+
+  constructor(containerEl: HTMLElement) {
+    this.colorEl = document.createElement("input");
+    this.colorEl.type = "color";
+    this.colorEl.addEventListener("input", () => {
+      this.value = this.colorEl.value;
+      void this.changeCallback?.(this.value);
+    });
+    containerEl.appendChild(this.colorEl);
+  }
+
+  getValue(): string {
+    return this.value;
+  }
+
+  setValue(value: string): this {
+    this.value = value;
+    this.colorEl.value = value;
+    return this;
+  }
+
+  onChange(callback: (value: string) => unknown): this {
+    this.changeCallback = callback;
+    return this;
+  }
+}
+
 export class Setting {
   settingEl: HTMLElement;
   nameEl: HTMLElement;
@@ -306,6 +509,11 @@ export class Setting {
     cb(new TextComponent(this.controlEl));
     return this;
   }
+
+  addColorPicker(cb: (component: ColorComponent) => unknown): this {
+    cb(new ColorComponent(this.controlEl));
+    return this;
+  }
 }
 
 export function setIcon(parent: HTMLElement, iconId: string): void {
@@ -315,3 +523,5 @@ export function setIcon(parent: HTMLElement, iconId: string): void {
 export function getLanguage(): string {
   return "en";
 }
+
+export type SettingDefinitionItem = Record<string, unknown>;

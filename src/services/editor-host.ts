@@ -6,7 +6,7 @@ import { selectionLinesFromRange } from "./gesture";
 export type TabSizeHost = { state: { tabSize?: number } };
 
 export function docFromView(view: EditorView): Doc {
-  return view.state.doc as unknown as Doc;
+  return view.state.doc;
 }
 
 export function readTabSize(view: TabSizeHost): number {

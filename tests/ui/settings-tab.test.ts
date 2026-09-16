@@ -46,4 +46,19 @@ describe("TinyDraggerSettingTab", () => {
     expect(picker).not.toBeNull();
     expect(picker?.value).toBe("#aabbcc");
   });
+
+  it("exposes declarative setting definitions for Obsidian search", () => {
+    setLocaleForTests("en");
+    const plugin = new TinyDraggerPlugin(
+      {} as never,
+      { id: "tiny-dragger" } as never,
+    );
+    plugin.settings = { ...DEFAULT_SETTINGS };
+    const tab = new TinyDraggerSettingTab({} as never, plugin);
+    const definitions = tab.getSettingDefinitions();
+    const names = definitions.map((item) => (item as { name?: string }).name);
+    expect(names).toContain("Handle color");
+    expect(names).toContain("Handle size");
+    expect(names).toContain("Handle horizontal offset");
+  });
 });

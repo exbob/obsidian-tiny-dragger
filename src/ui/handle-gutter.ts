@@ -5,6 +5,7 @@ import {
   ViewPlugin,
   type EditorView,
 } from "@codemirror/view";
+import type {} from "obsidian";
 import { blockAtLine } from "../engine/blocks";
 import { dragSourceField, type DragSession } from "../services/drag-session";
 import { docFromView, readTabSize } from "../services/editor-host";
@@ -105,9 +106,7 @@ class HandleGutterMarker extends GutterMarker {
 
 class HandleSpacerMarker extends GutterMarker {
   toDOM(): HTMLElement {
-    const spacer = document.createElement("div");
-    spacer.className = "tiny-dragger-gutter-spacer";
-    return spacer;
+    return createEl("div", { cls: "tiny-dragger-gutter-spacer" });
   }
 }
 
@@ -166,7 +165,7 @@ function hoveredStartLineAt(view: EditorView, event: MouseEvent): number | null 
 }
 
 export interface HandleGutterConfig {
-  getSettings(): TinyDraggerSettings;
+  getSettings: () => TinyDraggerSettings;
   session: DragSession;
 }
 
