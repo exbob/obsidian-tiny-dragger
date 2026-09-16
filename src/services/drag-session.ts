@@ -9,7 +9,7 @@ import {
   AUTO_SCROLL_EDGE_PX,
   AUTO_SCROLL_MAX_SPEED_PX,
 } from "../constants";
-import { planBlockMove } from "../engine/move";
+import { planBlockMove, previewTargetIndentWidth } from "../engine/move";
 import { resolveDragPayload } from "../engine/payload";
 import type { SelectionLines } from "../engine/payload";
 import type { TinyDraggerSettings } from "../settings";
@@ -120,6 +120,15 @@ export function dropLineY(view: EditorView, pos: number, belowMid: boolean): num
     view.scrollDOM.getBoundingClientRect().top +
     view.scrollDOM.scrollTop
   );
+}
+
+export function dropLineLeft(view: EditorView, indentColumns: number): number {
+  const scrollRect = view.scrollDOM.getBoundingClientRect();
+  const contentRect = view.contentDOM.getBoundingClientRect();
+  const contentLeft =
+    contentRect.left - scrollRect.left + view.scrollDOM.scrollLeft;
+  const charWidth = Math.max(1, view.defaultCharacterWidth);
+  return contentLeft + Math.max(0, indentColumns) * charWidth;
 }
 
 export class DragSession {
@@ -266,7 +275,20 @@ export class DragSession {
       return;
     }
     const belowMid = readBelowMid(current.view, pos, event.clientY);
-    this.indicator.show(dropLineY(current.view, pos, belowMid));
+    const tabSize = readTabSize(current.view);
+    const payload = current.payload ?? this.resolvePayload(current);
+    const indentColumns = previewTargetIndentWidth({
+      doc: docFromView(current.view),
+      selection: payload,
+      dx: event.clientX - current.startX,
+      tabSize,
+      indentUnit: tabSize,
+      indentStepPx: Math.max(1, current.view.defaultCharacterWidth * tabSize),
+    });
+    this.indicator.show(
+      dropLineY(current.view, pos, belowMid),
+      dropLineLeft(current.view, indentColumns),
+    );
   }
 
   private commitDrop(current: ActiveDrag, event: PointerEvent): void {

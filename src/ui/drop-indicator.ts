@@ -18,12 +18,14 @@ export class DropIndicator {
     this.element = element;
   }
 
-  show(y: number): void {
+  show(y: number, leftPx = 0): void {
     if (this.element === null) {
       return;
     }
     this.element.hidden = false;
     this.element.style.top = `${y}px`;
+    this.element.style.left = `${Math.max(0, leftPx)}px`;
+    this.element.style.right = "0px";
   }
 
   hide(): void {

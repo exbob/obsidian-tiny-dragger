@@ -23,6 +23,26 @@ function allowsHorizontalIndent(selection: BlockSelection): boolean {
   );
 }
 
+export function previewTargetIndentWidth(params: {
+  doc: Doc;
+  selection: BlockSelection;
+  dx: number;
+  tabSize: number;
+  indentUnit: number;
+  indentStepPx?: number;
+}): number {
+  const originWidth = sourceIndentWidth(params.doc, params.selection, params.tabSize);
+  if (!allowsHorizontalIndent(params.selection)) {
+    return originWidth;
+  }
+  return indentWidthFromDx(
+    originWidth,
+    params.dx,
+    params.indentUnit,
+    params.indentStepPx,
+  );
+}
+
 export function planBlockMove(params: {
   doc: Doc;
   selection: BlockSelection;
@@ -34,14 +54,7 @@ export function planBlockMove(params: {
   indentStepPx?: number;
 }): DocEdit[] | null {
   const originWidth = sourceIndentWidth(params.doc, params.selection, params.tabSize);
-  const targetWidth = allowsHorizontalIndent(params.selection)
-    ? indentWidthFromDx(
-        originWidth,
-        params.dx,
-        params.indentUnit,
-        params.indentStepPx,
-      )
-    : originWidth;
+  const targetWidth = previewTargetIndentWidth(params);
   const position = locateDropPosition({
     doc: params.doc,
     selection: params.selection,
