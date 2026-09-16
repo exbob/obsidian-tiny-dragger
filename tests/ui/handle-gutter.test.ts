@@ -85,11 +85,16 @@ describe("handle gutter hover", () => {
     );
   });
 
-  it("keeps the default left handle inset toward the content", () => {
+  it("does not reserve layout space beside the text", () => {
     const { view } = mount();
     expect(view.dom.style.getPropertyValue("--tiny-dragger-handle-offset")).toBe(
-      "10px",
+      "-28px",
     );
+  });
+
+  it("uses a thin spacer so the gutter does not adopt the handle width", () => {
+    const { view } = mount();
+    expect(view.dom.querySelector(".tiny-dragger-gutter-spacer")).not.toBeNull();
   });
 
   it("always places the handle in the left gutter", () => {

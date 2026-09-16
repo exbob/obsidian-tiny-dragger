@@ -76,9 +76,7 @@ class HandleGutterMarker extends GutterMarker {
 class HandleSpacerMarker extends GutterMarker {
   toDOM(): HTMLElement {
     const spacer = document.createElement("div");
-    spacer.className = "tiny-dragger-handle";
-    spacer.style.visibility = "hidden";
-    spacer.style.pointerEvents = "none";
+    spacer.className = "tiny-dragger-gutter-spacer";
     return spacer;
   }
 }

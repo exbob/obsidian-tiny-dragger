@@ -56,11 +56,11 @@ describe("applyHandleAppearance", () => {
     );
   });
 
-  it("insets the handle 10px toward the content", () => {
+  it("pulls the handle left of the text without reserving a gutter column", () => {
     const el = document.createElement("div");
     applyHandleAppearance(el, DEFAULT_SETTINGS);
     expect(el.style.getPropertyValue("--tiny-dragger-handle-offset")).toBe(
-      "10px",
+      "-28px",
     );
   });
 });
@@ -95,12 +95,12 @@ describe("handle icon paint", () => {
     expect(background.toLowerCase()).toBe("#ff00aa");
   });
 
-  it("does not keep a right-side gutter overlay", () => {
+  it("does not reserve a full handle-width column in the gutter", () => {
     const css = readFileSync(
       path.resolve(__dirname, "../../styles.css"),
       "utf8",
     );
-    expect(css).not.toMatch(/tiny-dragger-side-right/);
-    expect(css).not.toMatch(/cm-gutters-after/);
+    expect(css).toMatch(/\.tiny-dragger-gutter\s*\{[^}]*width:\s*0/);
+    expect(css).toMatch(/\.tiny-dragger-gutter\s*\{[^}]*position:\s*absolute/);
   });
 });

@@ -61,13 +61,19 @@ describe("handleCssColor", () => {
 });
 
 describe("handleCssOffset", () => {
-  it("insets the left handle 10px toward the content", () => {
-    expect(handleCssOffset(DEFAULT_SETTINGS)).toBe("10px");
+  it("pulls the handle left by its size plus the visual gap, without reserving a column", () => {
+    expect(handleCssOffset(DEFAULT_SETTINGS)).toBe("-28px");
     expect(
       handleCssOffset({
         ...DEFAULT_SETTINGS,
         handleOffset: 5,
       }),
-    ).toBe("15px");
+    ).toBe("-23px");
+    expect(
+      handleCssOffset({
+        ...DEFAULT_SETTINGS,
+        handleSize: 24,
+      }),
+    ).toBe("-32px");
   });
 });

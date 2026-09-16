@@ -4,7 +4,7 @@ import {
   HANDLE_OFFSET_DEFAULT,
   HANDLE_OFFSET_MAX,
   HANDLE_OFFSET_MIN,
-  HANDLE_SIDE_INSET_PX,
+  HANDLE_GUTTER_GAP_PX,
   HANDLE_SIZE_DEFAULT,
   HANDLE_SIZE_MAX,
   HANDLE_SIZE_MIN,
@@ -27,6 +27,6 @@ describe("constants", () => {
     expect(HANDLE_OFFSET_MIN).toBe(-80);
     expect(HANDLE_OFFSET_MAX).toBe(80);
     expect(HANDLE_OFFSET_DEFAULT).toBe(0);
-    expect(HANDLE_SIDE_INSET_PX).toBe(10);
+    expect(HANDLE_GUTTER_GAP_PX).toBe(8);
   });
 });

@@ -1,6 +1,21 @@
-.tiny-dragger-gutter {
-  width: calc(var(--tiny-dragger-handle-size, 20px) + 12px);
+.cm-gutter.tiny-dragger-gutter {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border: 0;
   overflow: visible;
+  background: transparent;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.tiny-dragger-gutter-spacer {
+  width: 0;
+  height: 1px;
 }
 
 .cm-gutters.tiny-dragger-gutter-host {
@@ -13,7 +28,7 @@
   align-items: center;
   width: var(--tiny-dragger-handle-size, 20px);
   color: var(--tiny-dragger-handle-color, var(--interactive-accent));
-  transform: translateX(var(--tiny-dragger-handle-offset, 10px));
+  transform: translateX(var(--tiny-dragger-handle-offset, -28px));
   opacity: 0;
   pointer-events: none;
 }
