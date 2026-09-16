@@ -32,6 +32,21 @@ describe("normalizeSettings", () => {
     expect("handleSide" in settings).toBe(false);
   });
 
+  it("rejects out-of-range offsets", () => {
+    expect(
+      normalizeSettings({
+        ...DEFAULT_SETTINGS,
+        handleOffset: 21,
+      }).handleOffset,
+    ).toBe(DEFAULT_SETTINGS.handleOffset);
+    expect(
+      normalizeSettings({
+        ...DEFAULT_SETTINGS,
+        handleOffset: -20,
+      }).handleOffset,
+    ).toBe(-20);
+  });
+
   it("rejects non-hex custom colors", () => {
     expect(
       normalizeSettings({

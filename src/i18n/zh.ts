@@ -9,7 +9,7 @@ export const zh: Record<MessageKey, string> = {
   "setting.handleColorCustom": "自定义",
   "setting.handleColorHex": "自定义颜色",
   "setting.handleOffsetName": "手柄横向偏移",
-  "setting.handleOffsetDesc": "向左（−80）或向右（+80）平移手柄，单位像素。",
+  "setting.handleOffsetDesc": "向左（−20）或向右（+20）平移手柄，单位像素。",
   "menu.paragraph": "转换为纯文本段落",
   "menu.heading": "转换为标题",
   "menu.headingN": "标题 {level}",

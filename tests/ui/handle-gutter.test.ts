@@ -97,6 +97,25 @@ describe("handle gutter hover", () => {
     expect(view.dom.querySelector(".tiny-dragger-gutter-spacer")).not.toBeNull();
   });
 
+  it("centers the handle on a tall first line such as a heading", async () => {
+    const { view } = mount();
+    vi.spyOn(view, "coordsAtPos").mockReturnValue({
+      left: 0,
+      right: 10,
+      top: 0,
+      bottom: 40,
+    });
+    hoverContent(view);
+    const handle = visibleHandle(view);
+    expect(handle).not.toBeNull();
+    expect(handle!.dataset.startLine).toBe("1");
+    await vi.waitFor(() => {
+      expect(
+        handle!.style.getPropertyValue("--tiny-dragger-handle-nudge-y"),
+      ).toBe("calc(20px - 50%)");
+    });
+  });
+
   it("always places the handle in the left gutter", () => {
     const { view } = mount();
     hoverContent(view);

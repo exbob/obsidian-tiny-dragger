@@ -14,6 +14,24 @@ export function applyHandleAppearance(
   el.style.setProperty("--tiny-dragger-handle-offset", handleCssOffset(settings));
 }
 
+export function applyHandleLineAlign(
+  el: HTMLElement,
+  firstLineHeightPx: number | null,
+): void {
+  if (
+    firstLineHeightPx === null ||
+    !Number.isFinite(firstLineHeightPx) ||
+    firstLineHeightPx <= 0
+  ) {
+    el.style.removeProperty("--tiny-dragger-handle-nudge-y");
+    return;
+  }
+  el.style.setProperty(
+    "--tiny-dragger-handle-nudge-y",
+    `calc(${firstLineHeightPx / 2}px - 50%)`,
+  );
+}
+
 export function createHandleElement(handlers: HandleDomHandlers): HTMLElement {
   const root = document.createElement("div");
   root.className = "tiny-dragger-handle";

@@ -10,7 +10,7 @@ export const en: Record<MessageKey, string> = {
   "setting.handleColorCustom": "Custom",
   "setting.handleColorHex": "Custom color",
   "setting.handleOffsetName": "Handle horizontal offset",
-  "setting.handleOffsetDesc": "Shift the handle left (−80) or right (+80) px.",
+  "setting.handleOffsetDesc": "Shift the handle left (−20) or right (+20) px.",
   "menu.paragraph": "Paragraph",
   "menu.heading": "Heading",
   "menu.headingN": "Heading {level}",

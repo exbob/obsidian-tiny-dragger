@@ -19,6 +19,9 @@ describe("TinyDraggerSettingTab", () => {
     );
     expect(names.join("\n")).toContain("Handle size");
     expect(names.join("\n")).toContain("Handle color");
+    expect(names.join("\n").indexOf("Handle color")).toBeLessThan(
+      names.join("\n").indexOf("Handle size"),
+    );
     expect(names.join("\n")).not.toContain("Handle side");
     expect(names.join("\n")).toContain("Handle horizontal offset");
     expect(tab.containerEl.querySelector('input[type="color"]')).toBeNull();

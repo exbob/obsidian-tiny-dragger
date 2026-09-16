@@ -5,6 +5,7 @@ import { setLocaleForTests } from "../../src/i18n";
 import { DEFAULT_SETTINGS, THEME_HANDLE_COLOR } from "../../src/settings";
 import {
   applyHandleAppearance,
+  applyHandleLineAlign,
   createHandleElement,
 } from "../../src/ui/handle-dom";
 
@@ -47,6 +48,16 @@ describe("applyHandleAppearance", () => {
     expect(el.style.getPropertyValue("--tiny-dragger-handle-color")).toBe(
       "#aabbcc",
     );
+  });
+
+  it("nudges the handle to the vertical center of a measured first line", () => {
+    const el = document.createElement("div");
+    applyHandleLineAlign(el, 40);
+    expect(el.style.getPropertyValue("--tiny-dragger-handle-nudge-y")).toBe(
+      "calc(20px - 50%)",
+    );
+    applyHandleLineAlign(el, null);
+    expect(el.style.getPropertyValue("--tiny-dragger-handle-nudge-y")).toBe("");
   });
 
   it("pulls the handle left of the text without reserving a gutter column", () => {
@@ -103,7 +114,7 @@ describe("handle icon paint", () => {
       "utf8",
     );
     expect(css).toMatch(
-      /translateY\(\s*calc\(\s*0\.5lh\s*-\s*50%\s*\)\s*\)/,
+      /translateY\(\s*var\(--tiny-dragger-handle-nudge-y,\s*calc\(\s*0\.5lh\s*-\s*50%\s*\)\s*\)\s*\)/,
     );
   });
 

@@ -22,20 +22,6 @@ export class TinyDraggerSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.replaceChildren();
 
-    new Setting(containerEl)
-      .setName(t("setting.handleSizeName"))
-      .setDesc(t("setting.handleSizeDesc"))
-      .addSlider((slider) => {
-        slider
-          .setLimits(HANDLE_SIZE_MIN, HANDLE_SIZE_MAX, HANDLE_SIZE_STEP)
-          .setDynamicTooltip()
-          .setValue(this.plugin.settings.handleSize)
-          .onChange(async (value) => {
-            this.plugin.settings.handleSize = value;
-            await this.plugin.saveSettings();
-          });
-      });
-
     const colorSetting = new Setting(containerEl)
       .setName(t("setting.handleColorName"))
       .setDesc(t("setting.handleColorDesc"))
@@ -63,6 +49,20 @@ export class TinyDraggerSettingTab extends PluginSettingTab {
       });
       colorSetting.controlEl.append(picker);
     }
+
+    new Setting(containerEl)
+      .setName(t("setting.handleSizeName"))
+      .setDesc(t("setting.handleSizeDesc"))
+      .addSlider((slider) => {
+        slider
+          .setLimits(HANDLE_SIZE_MIN, HANDLE_SIZE_MAX, HANDLE_SIZE_STEP)
+          .setDynamicTooltip()
+          .setValue(this.plugin.settings.handleSize)
+          .onChange(async (value) => {
+            this.plugin.settings.handleSize = value;
+            await this.plugin.saveSettings();
+          });
+      });
 
     new Setting(containerEl)
       .setName(t("setting.handleOffsetName"))

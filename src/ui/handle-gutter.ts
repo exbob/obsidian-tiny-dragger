@@ -9,7 +9,11 @@ import { blockAtLine } from "../engine/blocks";
 import { dragSourceField, type DragSession } from "../services/drag-session";
 import { docFromView, readTabSize } from "../services/editor-host";
 import { type TinyDraggerSettings } from "../settings";
-import { applyHandleAppearance, createHandleElement } from "./handle-dom";
+import {
+  applyHandleAppearance,
+  applyHandleLineAlign,
+  createHandleElement,
+} from "./handle-dom";
 
 const liveViews = new Set<EditorView>();
 
@@ -61,7 +65,9 @@ class HandleGutterMarker extends GutterMarker {
       },
     });
     root.classList.add("is-visible");
+    root.dataset.startLine = String(this.startLine);
     applyHandleAppearance(root, this.getSettings());
+    scheduleHandleLineAlign(view, root, this.startLine);
     return root;
   }
 }
@@ -74,11 +80,47 @@ class HandleSpacerMarker extends GutterMarker {
   }
 }
 
+function firstLineHeightPx(view: EditorView, startLine: number): number | null {
+  if (startLine < 1 || startLine > view.state.doc.lines) {
+    return null;
+  }
+  try {
+    const coords = view.coordsAtPos(view.state.doc.line(startLine).from);
+    if (coords === null) {
+      return null;
+    }
+    const height = coords.bottom - coords.top;
+    return height > 0 ? height : null;
+  } catch {
+    return null;
+  }
+}
+
+function scheduleHandleLineAlign(
+  view: EditorView,
+  el: HTMLElement,
+  startLine: number,
+): void {
+  view.requestMeasure({
+    key: el,
+    read: () => firstLineHeightPx(view, startLine),
+    write: (height) => {
+      if (el.isConnected) {
+        applyHandleLineAlign(el, height);
+      }
+    },
+  });
+}
+
 function applyHandleCssVars(view: EditorView, settings: TinyDraggerSettings): void {
   applyHandleAppearance(view.dom, settings);
-  view.dom
-    .querySelectorAll<HTMLElement>(".tiny-dragger-handle")
-    .forEach((el) => applyHandleAppearance(el, settings));
+  view.dom.querySelectorAll<HTMLElement>(".tiny-dragger-handle").forEach((el) => {
+    applyHandleAppearance(el, settings);
+    const startLine = Number(el.dataset.startLine);
+    if (Number.isInteger(startLine)) {
+      scheduleHandleLineAlign(view, el, startLine);
+    }
+  });
 }
 
 function hoveredStartLineAt(view: EditorView, event: MouseEvent): number | null {

@@ -25,8 +25,8 @@ describe("constants", () => {
     expect(HANDLE_SIZE_MAX).toBe(28);
     expect(HANDLE_SIZE_STEP).toBe(2);
     expect(HANDLE_SIZE_DEFAULT).toBe(20);
-    expect(HANDLE_OFFSET_MIN).toBe(-80);
-    expect(HANDLE_OFFSET_MAX).toBe(80);
+    expect(HANDLE_OFFSET_MIN).toBe(-20);
+    expect(HANDLE_OFFSET_MAX).toBe(20);
     expect(HANDLE_OFFSET_DEFAULT).toBe(0);
     expect(HANDLE_GUTTER_GAP_PX).toBe(8);
     expect(HANDLE_GRIP_PAD_PX).toBe(2);
