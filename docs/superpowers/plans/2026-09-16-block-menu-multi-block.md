@@ -22,7 +22,7 @@
 
 | File | Responsibility |
 |------|----------------|
-| `src/engine/clipboard.ts` | Add `selectionText(doc, selection)` that concatenates per-block text in order. |
+| `src/engine/clipboard.ts` | Add `selectionText(doc, selection)` as a contiguous line span from the first selected block’s `startLine` through the last block’s `endLine` (preserves inter-block blank lines; same trailing-newline rule as `blockText`). Not per-block `blockText` map/join. |
 | `src/engine/convert.ts` | Add `planSelectionConvert(doc, selection, request)` that merges non-noop single-block plans. |
 | `src/ui/block-menu.ts` | Take `BlockSelection`; run copy/cut/delete/convert against it. |
 | `src/main.ts` | On grip click, resolve payload then open the menu. |
@@ -42,7 +42,7 @@
 
 **Interfaces:**
 - Consumes: existing `blockText(doc: Doc, block: Block): string`; `BlockSelection` from `md-dragger/domain`
-- Produces: `selectionText(doc: Doc, selection: BlockSelection): string`
+- Produces: `selectionText(doc: Doc, selection: BlockSelection): string` — contiguous `lineRangeText` span from first to last selected block (not per-block join).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -65,7 +65,7 @@ describe("selectionText", () => {
     expect(selectionText(doc, selectOne(block))).toBe(blockText(doc, block));
   });
 
-  it("concatenates blocks in document order", () => {
+  it("returns contiguous line span from first to last block", () => {
     const text = "alpha\n\nbravo\n\ncharlie\n";
     const doc = docFromText(text);
     const blocks = collectBlocks(doc, TAB);
@@ -83,7 +83,7 @@ Expected: FAIL — `selectionText` is not exported.
 
 - [ ] **Step 3: Write minimal implementation**
 
-In `src/engine/clipboard.ts`:
+In `src/engine/clipboard.ts`, slice document lines from the first selected block through the last. Do **not** `selection.blocks.map(blockText).join("")` — blank lines between paragraph blocks are outside each block’s `lines` range, so map/join drops them and fails the multi-block test.
 
 ```typescript
 import type { Block, BlockSelection, Doc } from "md-dragger/domain";
@@ -95,7 +95,17 @@ export function blockText(doc: Doc, block: Block): string {
 }
 
 export function selectionText(doc: Doc, selection: BlockSelection): string {
-  return selection.blocks.map((block) => blockText(doc, block)).join("");
+  const blocks = selection.blocks;
+  if (blocks.length === 0) {
+    return "";
+  }
+  const first = blocks[0]!;
+  const last = blocks[blocks.length - 1]!;
+  const text = lineRangeText(doc, {
+    startLine: first.lines.startLine,
+    endLine: last.lines.endLine,
+  });
+  return text.endsWith("\n") ? text : `${text}\n`;
 }
 ```
 

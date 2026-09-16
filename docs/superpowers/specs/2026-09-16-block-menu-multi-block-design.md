@@ -56,7 +56,7 @@ Handle pin behavior stays as today: pin to the clicked block’s start line unti
 | Capability | Multi-block behavior |
 |------------|----------------------|
 | Convert | Plan each block; skip `noop`; merge non-noop `TextChange`s; if all noop, do not dispatch. Apply changes in an order that preserves offsets (typically higher document positions first). |
-| Copy | Concatenate each block’s text in document order using existing per-block newline rules. |
+| Copy | Document-order contiguous slice from the first selected block’s start line through the last block’s end line (`lineRangeText` span); ensure a trailing newline like `blockText`. Preserves blank lines between blocks; not per-block text concatenation. |
 | Delete | Pass the full `BlockSelection` to existing `planBlockDelete`. |
 | Cut | Copy first; only delete if copy succeeds. |
 
