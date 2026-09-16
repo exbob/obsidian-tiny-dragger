@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { handleCssColor, type TinyDraggerSettings } from "../settings";
+import { handleCssColor, handleCssOffset, type TinyDraggerSettings } from "../settings";
 
 export interface HandleDomHandlers {
   onGripPointerDown: (event: PointerEvent) => void;
@@ -13,10 +13,7 @@ export function applyHandleAppearance(
 ): void {
   el.style.setProperty("--tiny-dragger-handle-size", `${settings.handleSize}px`);
   el.style.setProperty("--tiny-dragger-handle-color", handleCssColor(settings));
-  el.style.setProperty(
-    "--tiny-dragger-handle-offset",
-    `${settings.handleOffset}px`,
-  );
+  el.style.setProperty("--tiny-dragger-handle-offset", handleCssOffset(settings));
 }
 
 export function createHandleElement(handlers: HandleDomHandlers): HTMLElement {

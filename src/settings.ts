@@ -3,6 +3,7 @@ import {
   HANDLE_OFFSET_DEFAULT,
   HANDLE_OFFSET_MAX,
   HANDLE_OFFSET_MIN,
+  HANDLE_SIDE_INSET_PX,
   HANDLE_SIZE_DEFAULT,
   HANDLE_SIZE_MAX,
   HANDLE_SIZE_MIN,
@@ -13,7 +14,6 @@ export interface TinyDraggerSettings {
   handleSize: number;
   handleColorMode: "theme" | "custom";
   handleColor: string;
-  handleSide: "left" | "right";
   handleOffset: number;
 }
 
@@ -21,7 +21,6 @@ export const DEFAULT_SETTINGS: TinyDraggerSettings = {
   handleSize: HANDLE_SIZE_DEFAULT,
   handleColorMode: "theme",
   handleColor: DEFAULT_HANDLE_COLOR,
-  handleSide: "left",
   handleOffset: HANDLE_OFFSET_DEFAULT,
 };
 
@@ -31,6 +30,10 @@ export function handleCssColor(settings: TinyDraggerSettings): string {
   return settings.handleColorMode === "custom"
     ? settings.handleColor
     : THEME_HANDLE_COLOR;
+}
+
+export function handleCssOffset(settings: TinyDraggerSettings): string {
+  return `${HANDLE_SIDE_INSET_PX + settings.handleOffset}px`;
 }
 
 const HEX_COLOR = /^#([0-9a-fA-F]{6})$/;
@@ -71,10 +74,6 @@ export function normalizeSettings(value: unknown): TinyDraggerSettings {
     typeof record.handleColor === "string" && HEX_COLOR.test(record.handleColor)
       ? record.handleColor.toLowerCase()
       : DEFAULT_SETTINGS.handleColor;
-  const handleSide =
-    record.handleSide === "left" || record.handleSide === "right"
-      ? record.handleSide
-      : DEFAULT_SETTINGS.handleSide;
   const handleOffset = evenInRange(
     record.handleOffset,
     HANDLE_OFFSET_MIN,
@@ -82,5 +81,5 @@ export function normalizeSettings(value: unknown): TinyDraggerSettings {
     1,
     DEFAULT_SETTINGS.handleOffset,
   );
-  return { handleSize, handleColorMode, handleColor, handleSide, handleOffset };
+  return { handleSize, handleColorMode, handleColor, handleOffset };
 }

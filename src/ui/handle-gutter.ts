@@ -120,7 +120,6 @@ export interface HandleGutterConfig {
 }
 
 export function handleGutterExtension(config: HandleGutterConfig): Extension {
-  const settings = config.getSettings();
   const hoverPlugin = ViewPlugin.fromClass(
     class HandleHoverPlugin {
       private readonly onMouseMove: (event: MouseEvent) => void;
@@ -168,7 +167,7 @@ export function handleGutterExtension(config: HandleGutterConfig): Extension {
     hoverPlugin,
     gutter({
       class: "tiny-dragger-gutter",
-      side: settings.handleSide === "right" ? "after" : "before",
+      side: "before",
       initialSpacer: () => new HandleSpacerMarker(),
       lineMarker(view, line) {
         const hovered = view.state.field(hoveredStartLineField);

@@ -1,5 +1,6 @@
 .tiny-dragger-gutter {
   width: calc(var(--tiny-dragger-handle-size, 20px) + 12px);
+  overflow: visible;
 }
 
 .cm-gutters.tiny-dragger-gutter-host {
@@ -12,7 +13,7 @@
   align-items: center;
   width: var(--tiny-dragger-handle-size, 20px);
   color: var(--tiny-dragger-handle-color, var(--interactive-accent));
-  transform: translateX(var(--tiny-dragger-handle-offset, 0px));
+  transform: translateX(var(--tiny-dragger-handle-offset, 10px));
   opacity: 0;
   pointer-events: none;
 }

@@ -65,20 +65,6 @@ export class TinyDraggerSettingTab extends PluginSettingTab {
     }
 
     new Setting(containerEl)
-      .setName(t("setting.handleSideName"))
-      .setDesc(t("setting.handleSideDesc"))
-      .addDropdown((dropdown) => {
-        dropdown
-          .addOption("left", t("setting.handleSideLeft"))
-          .addOption("right", t("setting.handleSideRight"))
-          .setValue(this.plugin.settings.handleSide)
-          .onChange(async (value) => {
-            this.plugin.settings.handleSide = value === "right" ? "right" : "left";
-            await this.plugin.saveSettings();
-          });
-      });
-
-    new Setting(containerEl)
       .setName(t("setting.handleOffsetName"))
       .setDesc(t("setting.handleOffsetDesc"))
       .addSlider((slider) => {

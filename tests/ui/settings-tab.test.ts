@@ -5,7 +5,7 @@ import { DEFAULT_SETTINGS } from "../../src/settings";
 import { TinyDraggerSettingTab } from "../../src/ui/settings-tab";
 
 describe("TinyDraggerSettingTab", () => {
-  it("renders the four handle settings", () => {
+  it("renders the handle settings without a side control", () => {
     setLocaleForTests("en");
     const plugin = new TinyDraggerPlugin(
       {} as never,
@@ -19,7 +19,7 @@ describe("TinyDraggerSettingTab", () => {
     );
     expect(names.join("\n")).toContain("Handle size");
     expect(names.join("\n")).toContain("Handle color");
-    expect(names.join("\n")).toContain("Handle side");
+    expect(names.join("\n")).not.toContain("Handle side");
     expect(names.join("\n")).toContain("Handle horizontal offset");
     expect(tab.containerEl.querySelector('input[type="color"]')).toBeNull();
   });

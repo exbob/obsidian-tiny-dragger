@@ -55,6 +55,14 @@ describe("applyHandleAppearance", () => {
       "#aabbcc",
     );
   });
+
+  it("insets the handle 10px toward the content", () => {
+    const el = document.createElement("div");
+    applyHandleAppearance(el, DEFAULT_SETTINGS);
+    expect(el.style.getPropertyValue("--tiny-dragger-handle-offset")).toBe(
+      "10px",
+    );
+  });
 });
 
 describe("handle icon paint", () => {
@@ -85,5 +93,14 @@ describe("handle icon paint", () => {
     const dot = root.querySelector(".tiny-dragger-dot") as HTMLElement;
     const background = getComputedStyle(dot).backgroundColor;
     expect(background.toLowerCase()).toBe("#ff00aa");
+  });
+
+  it("does not keep a right-side gutter overlay", () => {
+    const css = readFileSync(
+      path.resolve(__dirname, "../../styles.css"),
+      "utf8",
+    );
+    expect(css).not.toMatch(/tiny-dragger-side-right/);
+    expect(css).not.toMatch(/cm-gutters-after/);
   });
 });

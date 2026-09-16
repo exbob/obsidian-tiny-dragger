@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_SETTINGS,
   handleCssColor,
+  handleCssOffset,
   normalizeSettings,
   THEME_HANDLE_COLOR,
 } from "../src/settings";
@@ -26,9 +27,9 @@ describe("normalizeSettings", () => {
       handleSize: 24,
       handleColorMode: "custom",
       handleColor: "#aabbcc",
-      handleSide: "right",
       handleOffset: -12,
     });
+    expect("handleSide" in settings).toBe(false);
   });
 
   it("rejects non-hex custom colors", () => {
@@ -56,5 +57,17 @@ describe("handleCssColor", () => {
         handleColor: "#aabbcc",
       }),
     ).toBe("#aabbcc");
+  });
+});
+
+describe("handleCssOffset", () => {
+  it("insets the left handle 10px toward the content", () => {
+    expect(handleCssOffset(DEFAULT_SETTINGS)).toBe("10px");
+    expect(
+      handleCssOffset({
+        ...DEFAULT_SETTINGS,
+        handleOffset: 5,
+      }),
+    ).toBe("15px");
   });
 });

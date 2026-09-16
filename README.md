@@ -24,7 +24,7 @@ Works in **Source mode** and **Live Preview**. Reading view has no handles.
 
 ### Handle
 
-Hover a block. A handle appears in the gutter (left by default):
+Hover a block. A handle appears in the left gutter:
 
 - **Four dots** in a square: click to open the block menu; press and drag to move the block.
 - **Short lines** above and below: hover to turn them into pluses; click to insert a blank line above or below.
@@ -48,7 +48,6 @@ Under Obsidian **Settings → Tiny Dragger**:
 | ------- | ----------- | ------- |
 | Handle size | 12–28 px, step 2 | 20 |
 | Handle color | Theme accent, or a custom color picker | Theme |
-| Handle side | Left or right gutter | Left |
 | Handle horizontal offset | −80 to 80 px | 0 |
 
 ## Known limits

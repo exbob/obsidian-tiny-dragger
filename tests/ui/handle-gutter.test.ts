@@ -20,16 +20,18 @@ describe("handle gutter hover", () => {
     }
   });
 
-  function mount(): { view: EditorView; session: DragSession } {
+  function mount(
+    settings = DEFAULT_SETTINGS,
+  ): { view: EditorView; session: DragSession } {
     const session = new DragSession({
-      getSettings: () => DEFAULT_SETTINGS,
+      getSettings: () => settings,
       onGripClick: () => {},
     });
     const view = new EditorView({
       state: EditorState.create({
         doc: "hello\n\nworld\n",
         extensions: handleGutterExtension({
-          getSettings: () => DEFAULT_SETTINGS,
+          getSettings: () => settings,
           session,
         }),
       }),
@@ -81,6 +83,20 @@ describe("handle gutter hover", () => {
     expect(handle!.style.getPropertyValue("--tiny-dragger-handle-color")).toBe(
       "var(--interactive-accent)",
     );
+  });
+
+  it("keeps the default left handle inset toward the content", () => {
+    const { view } = mount();
+    expect(view.dom.style.getPropertyValue("--tiny-dragger-handle-offset")).toBe(
+      "10px",
+    );
+  });
+
+  it("always places the handle in the left gutter", () => {
+    const { view } = mount();
+    hoverContent(view);
+    expect(view.dom.querySelector(".cm-gutters-before .tiny-dragger-gutter")).not.toBeNull();
+    expect(view.dom.querySelector(".cm-gutters-after .tiny-dragger-gutter")).toBeNull();
   });
 
   it("does not clear hover while a drag session is active", () => {
