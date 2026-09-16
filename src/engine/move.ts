@@ -7,6 +7,8 @@ import {
   type BlockSelection,
   type Doc,
   type DocEdit,
+  type MovePlan,
+  type TextChange,
 } from "md-dragger/domain";
 import { indentWidthFromDx, sourceIndentWidth } from "./indent";
 
@@ -41,6 +43,41 @@ export function previewTargetIndentWidth(params: {
     params.indentUnit,
     params.indentStepPx,
   );
+}
+
+/**
+ * md-dragger's ordered-list renumber compose turns an in-place replace
+ * `{from, to: deleteTo, insert}` into a pure insert `{from, to: from, insert}`,
+ * which duplicates the row. Restore the deleted span for that case.
+ */
+export function repairInPlaceIndentEdits(
+  plan: MovePlan,
+  edits: DocEdit[],
+): DocEdit[] {
+  if (!plan.allowIndent) {
+    return edits;
+  }
+  const segments = plan.captured.payload.segments;
+  if (segments.length !== 1) {
+    return edits;
+  }
+  const segment = segments[0];
+  if (segment === undefined || segment.deleteTo <= segment.deleteFrom) {
+    return edits;
+  }
+  return edits.map((edit) => ({
+    ...edit,
+    changes: edit.changes.map((change: TextChange) => {
+      if (
+        change.from === segment.deleteFrom &&
+        change.to === change.from &&
+        change.insert.length > 0
+      ) {
+        return { ...change, to: segment.deleteTo };
+      }
+      return change;
+    }),
+  }));
 }
 
 export function planBlockMove(params: {
@@ -79,5 +116,5 @@ export function planBlockMove(params: {
   if (isReject(edits)) {
     return null;
   }
-  return edits;
+  return repairInPlaceIndentEdits(planned.value, edits);
 }

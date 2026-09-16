@@ -1,4 +1,4 @@
-import { selectOne } from "md-dragger/domain";
+import { BlockType, selectOne } from "md-dragger/domain";
 import { describe, expect, it } from "vitest";
 import { applyTextChanges } from "../../src/engine/apply";
 import { blockAtLine, collectBlocks } from "../../src/engine/blocks";
@@ -128,5 +128,42 @@ describe("planBlockMove", () => {
     - 选项1-2
     - 选项1-3
 `);
+  });
+
+  it("unnests an ordered child upward without duplicating the row", () => {
+    const text = `1. 选项0
+2. 选项1
+    1. 选项2
+`;
+    const doc = docFromText(text);
+    const selection = resolveDragPayload({
+      doc,
+      tabSize: 4,
+      origin: {
+        type: BlockType.ListItem,
+        lines: { startLine: 3, endLine: 3 },
+      },
+      selection: { fromLine: 3, toLine: 3, collapsed: true },
+    });
+    const edits = planBlockMove({
+      doc,
+      selection,
+      hitLine: 2,
+      belowMid: true,
+      dx: -32,
+      tabSize: 4,
+      indentUnit: 4,
+      indentStepPx: 32,
+    });
+    expect(edits).not.toBeNull();
+    const next = edits!.reduce(
+      (current, edit) => applyTextChanges(current, edit.changes),
+      text,
+    );
+    expect(next).toBe(`1. 选项0
+2. 选项1
+3. 选项2
+`);
+    expect(next.match(/选项2/g)).toHaveLength(1);
   });
 });
