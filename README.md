@@ -39,7 +39,7 @@ Hover a block. A four-dot handle appears over the left gutter (it does not shrin
 
 ### Block menu
 
-Click the four dots (without dragging) to convert the **current** block to paragraph, H1–H6, bulleted / numbered / task list, quote, `[!info]` / `[!warning]` / `[!danger]` / `[!example]`, code block, or math block — or, below a separator, to copy, cut, or delete it. Same-type conversions do nothing. The menu does not convert a multi-block selection as a group.
+Click the four dots (without dragging) to convert, copy, cut, or delete. Convert targets are paragraph, H1–H6, bulleted / numbered / task list, quote, `[!info]` / `[!warning]` / `[!danger]` / `[!example]`, code block, or math block — with copy / cut / delete below a separator. Same-type conversions do nothing. When a multi-block native selection includes the gripped block, these actions apply to that whole payload (same rules as drag); otherwise they apply only to the gripped block.
 
 ## Settings
 
@@ -55,7 +55,6 @@ Under Obsidian **Settings → Tiny Dragger**:
 
 - Desktop only. No handles in reading view or on mobile.
 - Block boundaries follow `md-dragger` and may not match Live Preview widgets exactly.
-- Menu conversion applies to one block, not a multi-block selection.
 - Inline `$…$` math is not a block. YAML frontmatter is not draggable.
 - No cross-file or cross-pane dragging.
 

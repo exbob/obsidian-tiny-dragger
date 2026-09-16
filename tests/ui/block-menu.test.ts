@@ -6,7 +6,11 @@ import { applyTextChanges } from "../../src/engine/apply";
 import { blockAtLine, collectBlocks } from "../../src/engine/blocks";
 import { docFromText } from "../../src/engine/doc";
 import { setLocaleForTests } from "../../src/i18n";
-import { openBlockMenu, populateBlockMenu } from "../../src/ui/block-menu";
+import {
+  openBlockMenu,
+  populateBlockMenu,
+  selectionForBlockMenu,
+} from "../../src/ui/block-menu";
 
 type Dispatched = {
   changes?: Array<{ from: number; to: number; insert: string }>;
@@ -310,5 +314,30 @@ describe("openBlockMenu", () => {
     expect(onClose).not.toHaveBeenCalled();
     shown[0]!.hide();
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("selectionForBlockMenu", () => {
+  it("selectionForBlockMenu matches resolveDragPayload for an in-selection grip", () => {
+    const text = "alpha\n\nbravo\n\ncharlie\n";
+    const doc = docFromText(text);
+    const blocks = collectBlocks(doc, 4);
+    const view = {
+      state: {
+        doc,
+        tabSize: 4,
+        selection: {
+          main: {
+            from: doc.line(1).from,
+            to: doc.line(5).to,
+            empty: false,
+          },
+        },
+      },
+    } as unknown as EditorView;
+    const payload = selectionForBlockMenu(view, blocks[1]!);
+    expect(payload.blocks.map((b) => b.lines.startLine)).toEqual(
+      blocks.map((b) => b.lines.startLine),
+    );
   });
 });

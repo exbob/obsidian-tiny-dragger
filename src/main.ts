@@ -1,5 +1,4 @@
 import { Compartment, type Extension } from "@codemirror/state";
-import { selectOne } from "md-dragger/domain";
 import { Plugin } from "obsidian";
 import { DragSession } from "./services/drag-session";
 import {
@@ -7,7 +6,7 @@ import {
   normalizeSettings,
   type TinyDraggerSettings,
 } from "./settings";
-import { openBlockMenu } from "./ui/block-menu";
+import { openBlockMenu, selectionForBlockMenu } from "./ui/block-menu";
 import {
   forEachLiveEditorView,
   handleGutterExtension,
@@ -29,7 +28,7 @@ export default class TinyDraggerPlugin extends Plugin {
         pinHandleStartLine(view, block.lines.startLine);
         openBlockMenu({
           view,
-          selection: selectOne(block),
+          selection: selectionForBlockMenu(view, block),
           event,
           settings: this.settings,
           onClose: () => pinHandleStartLine(view, null),

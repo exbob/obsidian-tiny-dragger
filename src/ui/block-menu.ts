@@ -1,11 +1,17 @@
 import type { EditorView } from "@codemirror/view";
-import type { BlockSelection } from "md-dragger/domain";
+import type { Block, BlockSelection } from "md-dragger/domain";
 import { Menu, Notice, type MenuItem } from "obsidian";
 import { selectionText } from "../engine/clipboard";
 import { planSelectionConvert, type ConvertRequest } from "../engine/convert";
 import { planBlockDelete } from "../engine/delete";
+import { resolveDragPayload } from "../engine/payload";
 import { t } from "../i18n";
-import { dispatchChanges, docFromView } from "../services/editor-host";
+import {
+  dispatchChanges,
+  docFromView,
+  readSelectionLines,
+  readTabSize,
+} from "../services/editor-host";
 
 export type BlockMenuAction =
   | ConvertRequest
@@ -123,6 +129,18 @@ export function populateBlockMenu(
     item.setIcon("trash-2");
     item.setWarning(true);
     item.onClick(() => onAction({ kind: "delete" }));
+  });
+}
+
+export function selectionForBlockMenu(
+  view: EditorView,
+  origin: Block,
+): BlockSelection {
+  return resolveDragPayload({
+    doc: docFromView(view),
+    tabSize: readTabSize(view),
+    origin,
+    selection: readSelectionLines(view),
   });
 }
 
